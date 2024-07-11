@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartCity.Modules.Authentication")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+af371f2e7933b3a17e6d479b466db2f7b9957afe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ed17d222d255d4731067250e382000f9c169b09")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartCity.Modules.Authentication")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartCity.Modules.Authentication")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

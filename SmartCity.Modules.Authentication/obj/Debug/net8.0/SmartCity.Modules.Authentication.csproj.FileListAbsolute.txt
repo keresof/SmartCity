@@ -1,0 +1,16 @@
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/bin/Debug/net8.0/SmartCity.Modules.Authentication.deps.json
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/bin/Debug/net8.0/SmartCity.Modules.Authentication.dll
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/bin/Debug/net8.0/SmartCity.Modules.Authentication.pdb
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/bin/Debug/net8.0/SmartCity.Core.dll
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/bin/Debug/net8.0/SmartCity.Core.pdb
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCity.Modules.Authentication.csproj.AssemblyReference.cache
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCity.Modules.Authentication.GeneratedMSBuildEditorConfig.editorconfig
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCity.Modules.Authentication.AssemblyInfoInputs.cache
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCity.Modules.Authentication.AssemblyInfo.cs
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCity.Modules.Authentication.csproj.CoreCompileInputs.cache
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCity.Modules.Authentication.sourcelink.json
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCit.F7A24DC7.Up2Date
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCity.Modules.Authentication.dll
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/refint/SmartCity.Modules.Authentication.dll
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/SmartCity.Modules.Authentication.pdb
+/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.Modules.Authentication/obj/Debug/net8.0/ref/SmartCity.Modules.Authentication.dll

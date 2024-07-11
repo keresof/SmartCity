@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "rSaHT24hEuj6mUcUkbkO0uxQW9NZDoHmE9OI8vmIN5jYB8uUF2404w0aegX07KUhzxje/DwSJumTPATISmha0Q==",
+  "dgSpecHash": "vPVRD1Kfc+nHzWi33ROIyKf9Izix1bG+gKDpA/Lxfg9Wvk6SXDCVwwSFb3fqxa9Ik20Lmj+RSik0epDYWVuY0Q==",
   "success": true,
   "projectFilePath": "/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.API/SmartCity.API.csproj",
   "expectedPackageFiles": [
@@ -46,13 +46,13 @@
     "/Users/keremcelik/.nuget/packages/microsoft.net.http.headers/2.2.0/microsoft.net.http.headers.2.2.0.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.netcore.platforms/1.0.1/microsoft.netcore.platforms.1.0.1.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.netcore.targets/1.0.1/microsoft.netcore.targets.1.0.1.nupkg.sha512",
-    "/Users/keremcelik/.nuget/packages/microsoft.openapi/1.4.3/microsoft.openapi.1.4.3.nupkg.sha512",
+    "/Users/keremcelik/.nuget/packages/microsoft.openapi/1.6.14/microsoft.openapi.1.6.14.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/newtonsoft.json/9.0.1/newtonsoft.json.9.0.1.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/npgsql/8.0.3/npgsql.8.0.3.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.0-preview.3/npgsql.entityframeworkcore.postgresql.9.0.0-preview.3.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/runtime.native.system/4.0.0/runtime.native.system.4.0.0.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/swashbuckle.aspnetcore/6.4.0/swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
-    "/Users/keremcelik/.nuget/packages/swashbuckle.aspnetcore.swagger/6.4.0/swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
+    "/Users/keremcelik/.nuget/packages/swashbuckle.aspnetcore.swagger/6.6.2/swashbuckle.aspnetcore.swagger.6.6.2.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.4.0/swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.4.0/swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/system.appcontext/4.1.0/system.appcontext.4.1.0.nupkg.sha512",
