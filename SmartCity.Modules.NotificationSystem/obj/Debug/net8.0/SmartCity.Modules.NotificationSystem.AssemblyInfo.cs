@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartCity.Modules.NotificationSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+af371f2e7933b3a17e6d479b466db2f7b9957afe")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartCity.Modules.NotificationSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartCity.Modules.NotificationSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

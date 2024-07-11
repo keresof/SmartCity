@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "aWtFSTmZSD4mQ49JYM+grJP3HoKJtnLHI5/iEaCPcTt9XxwzqAWQ+qeGBc8PDS3vPBd1X9K4dTs97a6UJijNqg==",
+  "dgSpecHash": "rSaHT24hEuj6mUcUkbkO0uxQW9NZDoHmE9OI8vmIN5jYB8uUF2404w0aegX07KUhzxje/DwSJumTPATISmha0Q==",
   "success": true,
   "projectFilePath": "/Users/keremcelik/RiderProjects/SmartCityProject/SmartCity.API/SmartCity.API.csproj",
   "expectedPackageFiles": [
@@ -28,10 +28,11 @@
     "/Users/keremcelik/.nuget/packages/microsoft.entityframeworkcore/9.0.0-preview.6.24327.4/microsoft.entityframeworkcore.9.0.0-preview.6.24327.4.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.0-preview.6.24327.4/microsoft.entityframeworkcore.abstractions.9.0.0-preview.6.24327.4.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.0-preview.6.24327.4/microsoft.entityframeworkcore.analyzers.9.0.0-preview.6.24327.4.nupkg.sha512",
+    "/Users/keremcelik/.nuget/packages/microsoft.entityframeworkcore.relational/9.0.0-preview.3.24172.4/microsoft.entityframeworkcore.relational.9.0.0-preview.3.24172.4.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.0-preview.6.24327.7/microsoft.extensions.caching.abstractions.9.0.0-preview.6.24327.7.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.extensions.caching.memory/9.0.0-preview.6.24327.7/microsoft.extensions.caching.memory.9.0.0-preview.6.24327.7.nupkg.sha512",
-    "/Users/keremcelik/.nuget/packages/microsoft.extensions.configuration.abstractions/2.2.0/microsoft.extensions.configuration.abstractions.2.2.0.nupkg.sha512",
+    "/Users/keremcelik/.nuget/packages/microsoft.extensions.configuration.abstractions/9.0.0-preview.3.24172.9/microsoft.extensions.configuration.abstractions.9.0.0-preview.3.24172.9.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.extensions.dependencyinjection/9.0.0-preview.6.24327.7/microsoft.extensions.dependencyinjection.9.0.0-preview.6.24327.7.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.0-preview.6.24327.7/microsoft.extensions.dependencyinjection.abstractions.9.0.0-preview.6.24327.7.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/microsoft.extensions.dependencymodel/2.1.0/microsoft.extensions.dependencymodel.2.1.0.nupkg.sha512",
@@ -48,6 +49,7 @@
     "/Users/keremcelik/.nuget/packages/microsoft.openapi/1.4.3/microsoft.openapi.1.4.3.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/newtonsoft.json/9.0.1/newtonsoft.json.9.0.1.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/npgsql/8.0.3/npgsql.8.0.3.nupkg.sha512",
+    "/Users/keremcelik/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.0-preview.3/npgsql.entityframeworkcore.postgresql.9.0.0-preview.3.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/runtime.native.system/4.0.0/runtime.native.system.4.0.0.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/swashbuckle.aspnetcore/6.4.0/swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
     "/Users/keremcelik/.nuget/packages/swashbuckle.aspnetcore.swagger/6.4.0/swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
