@@ -1,44 +1,44 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using ReportManagement.Application.Commands.CreateReport;
-using ReportManagement.Domain.Repositories;
-using ReportManagement.Infrastructure.Repositories;
-using Shared.Infrastructure;
-
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Services.AddControllers();
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReportManagement API", Version = "v1" });
-});
-
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("ReportManagementDb"));
-
-
-builder.Services.AddScoped<IReportRepository, ReportRepository>();
-
-
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateReportCommandHandler).Assembly));
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReportManagement API v1"));
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+var summaries = new[]
+{
+    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+};
 
-app.MapControllers();
+app.MapGet("/weatherforecast", () =>
+{
+    var forecast =  Enumerable.Range(1, 5).Select(index =>
+        new WeatherForecast
+        (
+            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            Random.Shared.Next(-20, 55),
+            summaries[Random.Shared.Next(summaries.Length)]
+        ))
+        .ToArray();
+    return forecast;
+})
+.WithName("GetWeatherForecast")
+.WithOpenApi();
 
 app.Run();
+
+record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}

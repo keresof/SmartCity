@@ -6,13 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ReportManagement.Domain\ReportManagement.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.5.1" />
-    <PackageReference Include="MediatR" Version="12.3.0" />
-  </ItemGroup>
-
 </Project>
