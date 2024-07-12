@@ -8,4 +8,8 @@ public record ReportDto(
     string Description,
     string Location,
     ReportStatus Status,
-    DateTime CreatedAt);
+    DateTime Created,
+    string MediaUrl,
+    string UserId,
+    DateTime? LastModified,
+    string LastModifiedBy);

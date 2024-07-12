@@ -21,11 +21,15 @@ public class CreateReportCommandHandler : IRequestHandler<CreateReportCommand, i
             Title = request.Title,
             Description = request.Description,
             Location = request.Location,
-            Status = ReportStatus.New,
-            CreatedAt = DateTime.UtcNow
+            Status = (ReportStatus)request.Status,
+            MediaUrl = request.MediaUrl,
+            UserId = request.UserId,
+            CreatedBy = request.UserId,
+            Created = DateTime.UtcNow
         };
 
         await _reportRepository.AddAsync(report);
+
         return report.Id;
     }
 }

@@ -1,24 +1,23 @@
 using MediatR;
 using ReportManagement.Application.DTOs;
+using ReportManagement.Application.Queries.GetReportsByUserId;
 using ReportManagement.Domain.Repositories;
 
 namespace ReportManagement.Application.Queries.GetReportById;
 
-public class GetReportByIdQueryHandler : IRequestHandler<GetReportByIdQuery, ReportDto>
+public class GetReportsByUserIdQueryHandler : IRequestHandler<GetReportsByUserIdQuery, List<ReportDto>>
 {
     private readonly IReportRepository _reportRepository;
 
-    public GetReportByIdQueryHandler(IReportRepository reportRepository)
+    public GetReportsByUserIdQueryHandler(IReportRepository reportRepository)
     {
         _reportRepository = reportRepository;
     }
 
-    public async Task<ReportDto> Handle(GetReportByIdQuery request, CancellationToken cancellationToken)
+    public async Task<List<ReportDto>> Handle(GetReportsByUserIdQuery request, CancellationToken cancellationToken)
     {
-        var report = await _reportRepository.GetByIdAsync(request.Id);
-        if (report == null) return null;
-
-        return new ReportDto(
+        var reports = await _reportRepository.GetByUserIdAsync(request.UserId);
+        return reports.Select(report => new ReportDto(
             report.Id,
             report.Title,
             report.Description,
@@ -26,9 +25,9 @@ public class GetReportByIdQueryHandler : IRequestHandler<GetReportByIdQuery, Rep
             report.Status,
             report.Created,
             report.MediaUrl,
-            report.CreatedBy,
+            report.UserId,
             report.LastModified,
             report.LastModifiedBy
-        );
+        )).ToList();
     }
 }
