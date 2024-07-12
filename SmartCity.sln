@@ -47,6 +47,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedbackManagement.Infrastr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedbackManagement.Application", "src\Modules\FeedbackManagement\FeedbackManagement.Application\FeedbackManagement.Application.csproj", "{A0A9F3E3-4119-4509-A929-189B292445AA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{65D04C40-D2E9-46AB-AA34-A17F5472666B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure.Tests", "tests\Shared.Infrastructure.Tests\Shared.Infrastructure.Tests.csproj", "{B4E57164-6014-4400-837D-487900FB4EA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +120,10 @@ Global
 		{A0A9F3E3-4119-4509-A929-189B292445AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0A9F3E3-4119-4509-A929-189B292445AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0A9F3E3-4119-4509-A929-189B292445AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4E57164-6014-4400-837D-487900FB4EA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4E57164-6014-4400-837D-487900FB4EA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4E57164-6014-4400-837D-487900FB4EA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4E57164-6014-4400-837D-487900FB4EA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7233B9AC-8A23-4707-9C02-80B1CFCE6C28} = {244C7187-76E1-4AA2-B14A-C60A3C2B24C7}
@@ -139,5 +147,6 @@ Global
 		{0E4F849A-91ED-4886-875E-4B50B090F283} = {A9CBD2A9-FA39-47BD-82EA-F3A08396CC43}
 		{EE3CF8BD-00B1-4370-A547-D7FBD41AC0C9} = {A9CBD2A9-FA39-47BD-82EA-F3A08396CC43}
 		{A0A9F3E3-4119-4509-A929-189B292445AA} = {A9CBD2A9-FA39-47BD-82EA-F3A08396CC43}
+		{B4E57164-6014-4400-837D-487900FB4EA4} = {65D04C40-D2E9-46AB-AA34-A17F5472666B}
 	EndGlobalSection
 EndGlobal

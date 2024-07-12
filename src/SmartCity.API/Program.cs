@@ -7,6 +7,8 @@ using UserManagement.Infrastructure.Repositories;
 using UserManagement.Infrastructure.Persistence;
 using UserManagement.Application.Interfaces;
 using Shared.Infrastructure;
+using Shared.Infrastructure.RateLimiting;
+using Shared.Infrastructure.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,12 @@ builder.Services.AddDbContext<UserManagementDbContext>(options =>
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOTPRepository, OTPRepository>();
+
+builder.Services.AddSingleton<RedisSlidingWindowLimiter>(sp => 
+{
+    var redis = RedisConnectionHelper.Connection;
+    return new RedisSlidingWindowLimiter(redis);
+});
 
 
 
