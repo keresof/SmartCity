@@ -1,4 +1,4 @@
-﻿namespace SmartCity.Modules.Authentication;
+﻿namespace SmartCity.Modules.UserManagemet;
 
 public class Class1
 {

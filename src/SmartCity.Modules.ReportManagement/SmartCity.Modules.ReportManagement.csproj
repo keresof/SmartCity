@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SmartCity.Core\SmartCity.Core.csproj" />
-      <ProjectReference Include="..\SmartCity.Modules.Authentication\SmartCity.Modules.Authentication.csproj" />
+      <ProjectReference Include="..\SmartCity.Modules.UserManagemet\SmartCity.Modules.UserManagemet.csproj" />
       <ProjectReference Include="..\SmartCity.Modules.FeedbackManagement\SmartCity.Modules.FeedbackManagement.csproj" />
       <ProjectReference Include="..\SmartCity.Modules.NotificationSystem\SmartCity.Modules.NotificationSystem.csproj" />
     </ItemGroup>

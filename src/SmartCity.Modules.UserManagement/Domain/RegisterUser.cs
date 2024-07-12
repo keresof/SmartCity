@@ -1,6 +1,6 @@
 using SmartCity.Core.Interfaces;
 
-namespace SmartCity.Modules.Authentication.Domain
+namespace SmartCity.Modules.UserManagemet.Domain
 {
     public class RegisterUserCommand : IRequest<int>, MediatR.IRequest<int>
     {

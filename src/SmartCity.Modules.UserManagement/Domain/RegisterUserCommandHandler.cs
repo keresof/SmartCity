@@ -1,9 +1,9 @@
 
 using MediatR;
 using SmartCity.Core.Interfaces;
-using SmartCity.Modules.Authentication.Domain;
+using SmartCity.Modules.UserManagemet.Domain;
 
-namespace SmartCity.Modules.Authentication.Application.Commands
+namespace SmartCity.Modules.UserManagemet.Application.Commands
 {
     public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, int>
     {
