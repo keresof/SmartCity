@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Core", "src\Smart
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Infrastructure", "src\SmartCity.Infrastructure\SmartCity.Infrastructure.csproj", "{D26A1E19-B6DA-4EEB-9AD8-677AD5D30D61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.Authentication", "src\SmartCity.Modules.Authentication\SmartCity.Modules.Authentication.csproj", "{C305CC42-04E7-4B91-828A-FF9B186AB923}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.Authentication", "src\SmartCity.Modules.UserManagement\SmartCity.Modules.UserManagement.csproj", "{C305CC42-04E7-4B91-828A-FF9B186AB923}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.ReportManagement", "src\SmartCity.Modules.ReportManagement\SmartCity.Modules.ReportManagement.csproj", "{C9CEED8A-ED1F-4B02-A49A-8347B1EA0A95}"
 EndProject
