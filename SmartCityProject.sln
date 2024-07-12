@@ -1,18 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.API", "SmartCity.API\SmartCity.API.csproj", "{6868F52D-CF69-4BB5-9421-1C221AE41368}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.API", "src\SmartCity.API\SmartCity.API.csproj", "{6868F52D-CF69-4BB5-9421-1C221AE41368}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Core", "SmartCity.Core\SmartCity.Core.csproj", "{F5CC510B-050A-4EE7-9731-B73DE6B3B60F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Core", "src\SmartCity.Core\SmartCity.Core.csproj", "{F5CC510B-050A-4EE7-9731-B73DE6B3B60F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Infrastructure", "SmartCity.Infrastructure\SmartCity.Infrastructure.csproj", "{D26A1E19-B6DA-4EEB-9AD8-677AD5D30D61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Infrastructure", "src\SmartCity.Infrastructure\SmartCity.Infrastructure.csproj", "{D26A1E19-B6DA-4EEB-9AD8-677AD5D30D61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.Authentication", "SmartCity.Modules.Authentication\SmartCity.Modules.Authentication.csproj", "{C305CC42-04E7-4B91-828A-FF9B186AB923}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.Authentication", "src\SmartCity.Modules.Authentication\SmartCity.Modules.Authentication.csproj", "{C305CC42-04E7-4B91-828A-FF9B186AB923}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.ReportManagement", "SmartCity.Modules.ReportManagement\SmartCity.Modules.ReportManagement.csproj", "{C9CEED8A-ED1F-4B02-A49A-8347B1EA0A95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.ReportManagement", "src\SmartCity.Modules.ReportManagement\SmartCity.Modules.ReportManagement.csproj", "{C9CEED8A-ED1F-4B02-A49A-8347B1EA0A95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.FeedbackManagement", "SmartCity.Modules.FeedbackManagement\SmartCity.Modules.FeedbackManagement.csproj", "{46DD8F9F-313B-4E88-8E99-2B67FF3BEF52}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.FeedbackManagement", "src\SmartCity.Modules.FeedbackManagement\SmartCity.Modules.FeedbackManagement.csproj", "{46DD8F9F-313B-4E88-8E99-2B67FF3BEF52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.NotificationSystem", "SmartCity.Modules.NotificationSystem\SmartCity.Modules.NotificationSystem.csproj", "{C1AAB710-8956-4A32-BB1E-E28A91935019}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCity.Modules.NotificationSystem", "src\SmartCity.Modules.NotificationSystem\SmartCity.Modules.NotificationSystem.csproj", "{C1AAB710-8956-4A32-BB1E-E28A91935019}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{397F4602-CB2C-48DA-A01D-E2205DB226D9}"
 EndProject
