@@ -1,6 +1,6 @@
 using SmartCity.Core.Entities;
 
-namespace SmartCity.Modules.Authentication.Domain
+namespace SmartCity.Modules.UserManagemet.Domain
 {
     public class User : BaseEntity
     {
