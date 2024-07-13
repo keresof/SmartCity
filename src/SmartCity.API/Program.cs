@@ -3,7 +3,12 @@ using Microsoft.OpenApi.Models;
 using ReportManagement.Application.Commands.CreateReport;
 using ReportManagement.Domain.Repositories;
 using ReportManagement.Infrastructure.Repositories;
+using UserManagement.Infrastructure.Repositories;
+using UserManagement.Infrastructure.Persistence;
+using UserManagement.Application.Interfaces;
 using Shared.Infrastructure;
+using Shared.Infrastructure.RateLimiting;
+using Shared.Infrastructure.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +23,21 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseInMemoryDatabase("ReportManagementDb"));
+builder.Services.AddDbContext<UserManagementDbContext>(options =>
+    options.UseInMemoryDatabase("UserManagementDb"));
 
 
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IOTPRepository, OTPRepository>();
+
+builder.Services.AddSingleton<RedisSlidingWindowLimiter>(sp => 
+{
+    var redis = RedisConnectionHelper.Connection;
+    return new RedisSlidingWindowLimiter(redis);
+});
+
+
 
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateReportCommandHandler).Assembly));

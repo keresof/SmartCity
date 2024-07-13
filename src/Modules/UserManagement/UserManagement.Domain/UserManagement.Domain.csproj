@@ -1,5 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Shared.Common\Shared.Common.csproj" />
+  </ItemGroup>
+  
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -8,10 +11,9 @@
 
   <ItemGroup>
     <Folder Include="Entities\**" />
+    <Folder Include="Enums\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared.Common\Shared.Common.csproj" />
-  </ItemGroup>
+
 
 </Project>
