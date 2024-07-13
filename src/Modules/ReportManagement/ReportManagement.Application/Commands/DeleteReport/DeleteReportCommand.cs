@@ -3,5 +3,5 @@ using System;
 
 namespace ReportManagement.Application.Commands.DeleteReport
 {
-    public record DeleteReportCommand(int Id, Guid UserId) : IRequest<int>;
+    public record DeleteReportCommand(Guid Id, Guid UserId) : IRequest<Guid>;
 }

@@ -7,10 +7,10 @@ namespace ReportManagement.Domain.Repositories
 {
     public interface IReportRepository
     {
-        Task<Report> GetByIdAsync(int id);
+        Task<Report> GetByIdAsync(Guid id);
         Task AddAsync(Report report);
         Task UpdateAsync(Report report);
-        Task DeleteAsync(int id);
+        Task DeleteAsync(Guid id);
         Task<List<Report>> SearchAsync(string? title, string? location);
         Task<List<Report>> GetByUserIdAsync(Guid userId);
     }

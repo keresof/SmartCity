@@ -30,7 +30,7 @@ public class ReportsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<int>> UpdateReport(int id, [FromBody] UpdateReportCommand command)
+    public async Task<ActionResult<int>> UpdateReport(Guid id, [FromBody] UpdateReportCommand command)
     {
         if (id != command.Id) return BadRequest();
 
@@ -46,7 +46,7 @@ public class ReportsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<int>> DeleteReport(int id, [FromBody] DeleteReportCommand command)
+    public async Task<ActionResult<int>> DeleteReport(Guid id, [FromBody] DeleteReportCommand command)
     {
         try
         {
@@ -64,7 +64,7 @@ public class ReportsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ReportDto>> GetReportById(int id)
+    public async Task<ActionResult<ReportDto>> GetReportById(Guid id)
     {
         try
         {
