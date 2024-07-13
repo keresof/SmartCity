@@ -1,11 +1,12 @@
-// ReportManagement.Application.Queries.SearchReports.SearchReportsQueryHandler.cs
-
 using MediatR;
 using ReportManagement.Application.DTOs;
-using ReportManagement.Application.Queries.SearchReports;
 using ReportManagement.Domain.Repositories;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ReportManagement.Application.Queries.GetReportById
+namespace ReportManagement.Application.Queries.SearchReports
 {
     public class SearchReportsQueryHandler : IRequestHandler<SearchReportsQuery, List<ReportDto>>
     {
@@ -18,7 +19,7 @@ namespace ReportManagement.Application.Queries.GetReportById
 
         public async Task<List<ReportDto>> Handle(SearchReportsQuery request, CancellationToken cancellationToken)
         {
-            var reports = await _reportRepository.SearchAsync(request.Title, request.Description);
+            var reports = await _reportRepository.SearchAsync(request.Title, request.Location);
             return reports.Select(report => new ReportDto(
                 report.Id,
                 report.Title,
@@ -27,9 +28,10 @@ namespace ReportManagement.Application.Queries.GetReportById
                 report.Status,
                 report.Created,
                 report.MediaUrl,
-                report.CreatedBy,
+                report.UserId,
                 report.LastModified,
-                report.LastModifiedBy
+                report.LastModifiedBy,
+                report.CreatedBy
             )).ToList();
         }
     }
