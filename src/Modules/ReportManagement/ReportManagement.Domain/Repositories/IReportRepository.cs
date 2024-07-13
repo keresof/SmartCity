@@ -1,11 +1,17 @@
+// ReportManagement.Domain.Repositories.IReportRepository.cs
 using ReportManagement.Domain.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace ReportManagement.Domain.Repositories;
-
-public interface IReportRepository
+namespace ReportManagement.Domain.Repositories
 {
-    Task<Report> GetByIdAsync(int id);
-    Task AddAsync(Report report);
-    Task<List<Report>> SearchAsync(string? title, string? description);
-    Task<List<Report>> GetByUserIdAsync(string userId); // New method to get reports by user ID
+    public interface IReportRepository
+    {
+        Task<Report> GetByIdAsync(int id);
+        Task AddAsync(Report report);
+        Task UpdateAsync(Report report);
+        Task DeleteAsync(int id);
+        Task<List<Report>> SearchAsync(string? title, string? location);
+        Task<List<Report>> GetByUserIdAsync(Guid userId);
+    }
 }

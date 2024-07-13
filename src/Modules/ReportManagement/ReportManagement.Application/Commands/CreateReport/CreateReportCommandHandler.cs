@@ -23,10 +23,11 @@ public class CreateReportCommandHandler : IRequestHandler<CreateReportCommand, i
             Location = request.Location,
             Status = (ReportStatus)request.Status,
             MediaUrl = request.MediaUrl,
-            UserId = request.UserId,
-            CreatedBy = request.UserId,
-            Created = DateTime.UtcNow
+            UserId = request.UserId
         };
+
+        report.SetCreatedBy(request.UserId.ToString());
+        report.SetLastModifiedBy(request.UserId.ToString());
 
         await _reportRepository.AddAsync(report);
 

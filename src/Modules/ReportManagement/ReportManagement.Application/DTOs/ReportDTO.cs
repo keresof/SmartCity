@@ -10,6 +10,8 @@ public record ReportDto(
     ReportStatus Status,
     DateTime Created,
     string MediaUrl,
-    string UserId,
+    Guid UserId,
     DateTime? LastModified,
-    string LastModifiedBy);
+    string LastModifiedBy,
+    string CreatedBy
+);

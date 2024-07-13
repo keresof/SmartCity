@@ -5,5 +5,5 @@ using System.Collections.Generic;
 
 namespace ReportManagement.Application.Queries.GetReportsByUserId
 {
-    public record GetReportsByUserIdQuery(string UserId) : IRequest<List<ReportDto>>;
+    public record GetReportsByUserIdQuery(Guid UserId) : IRequest<List<ReportDto>>;
 }

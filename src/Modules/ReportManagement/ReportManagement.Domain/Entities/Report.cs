@@ -1,7 +1,6 @@
 // ReportManagement.Domain.Entities.Report.cs
-
-using ReportManagement.Domain.Enums;
 using Shared.Common.Abstract;
+using ReportManagement.Domain.Enums;
 
 namespace ReportManagement.Domain.Entities
 {
@@ -12,6 +11,6 @@ namespace ReportManagement.Domain.Entities
         public string Location { get; set; }
         public ReportStatus Status { get; set; }
         public string MediaUrl { get; set; }
-        public string UserId { get; set; } // The ID of the user who created the report
+        public Guid UserId { get; set; } // The ID of the user who created the report
     }
 }
