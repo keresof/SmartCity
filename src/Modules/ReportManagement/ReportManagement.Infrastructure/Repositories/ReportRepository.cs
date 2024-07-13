@@ -3,15 +3,15 @@
 using Microsoft.EntityFrameworkCore;
 using ReportManagement.Domain.Entities;
 using ReportManagement.Domain.Repositories;
-using Shared.Infrastructure;
+using ReportManagement.Infrastructure.Persistence;
 
 namespace ReportManagement.Infrastructure.Repositories;
 
 public class ReportRepository : IReportRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ReportManagementDbContext _context;
 
-    public ReportRepository(ApplicationDbContext context)
+    public ReportRepository(ReportManagementDbContext context)
     {
         _context = context;
     }
