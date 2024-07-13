@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ReportManagement.Domain.Entities;
 using ReportManagement.Domain.Repositories;
+using ReportManagement.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,12 @@ using Shared.Infrastructure;
 
 namespace ReportManagement.Infrastructure.Repositories
 {
+
     public class ReportRepository : IReportRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ReportManagementDbContext _context;
 
-        public ReportRepository(ApplicationDbContext context)
+        public ReportRepository(ReportManagementDbContext context)
         {
             _context = context;
         }

@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Domain.Entities;
 using UserManagement.Domain.Enums;
+using Shared.Infrastructure.Persistence;
 
 namespace UserManagement.Infrastructure.Persistence
 {
-    public class UserManagementDbContext : DbContext
+    public class UserManagementDbContext : ModuleDbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<OTP> OTPs { get; set; }
@@ -14,7 +15,7 @@ namespace UserManagement.Infrastructure.Persistence
         {
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public override void ConfigureModelBuilder(ModelBuilder modelBuilder)
         {         
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
