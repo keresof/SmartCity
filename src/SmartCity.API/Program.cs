@@ -12,10 +12,12 @@ using Shared.Infrastructure;
 using Shared.Infrastructure.RateLimiting;
 using Shared.Infrastructure.Redis;
 using Shared.Infrastructure.Persistence;
+using Shared.Common.DependencyInjection;
 using DotNetEnv;
 using System;
 using System.IO;
 using Npgsql;
+using Shared.Common.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,42 +37,10 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
-if (connectionString != null)
+foreach (var module in ModuleDiscovery.DiscoverModules())
 {
-    // Remove single quotes if present
-    connectionString = connectionString.Trim('\'');
-
-    // Parse the connection string
-    var uri = new Uri(connectionString);
-    var nBuilder = new NpgsqlConnectionStringBuilder
-    {
-        Host = uri.Host,
-        Port = uri.Port == -1 ? 5432 : uri.Port,
-        Username = uri.UserInfo.Split(':')[0],
-        Password = uri.UserInfo.Split(':')[1],
-        Database = uri.LocalPath.TrimStart('/'),
-        SslMode = SslMode.Require
-    };
-
-    var parsedConnectionString = nBuilder.ToString();
-
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(parsedConnectionString));
-
-    builder.Services.AddDbContext<UserManagementDbContext>(options =>
-        options.UseNpgsql(parsedConnectionString));
-
-    builder.Services.AddDbContext<ReportManagementDbContext>(options => 
-        options.UseNpgsql(parsedConnectionString));
+    module?.RegisterModule(builder.Services, builder.Configuration);
 }
-else
-{
-    Console.WriteLine("DefaultConnection not found in environment variables");
-}
-
-builder.Services.AddScoped<IModuleDbContext, UserManagementDbContext>();
-builder.Services.AddScoped<IModuleDbContext, ReportManagementDbContext>();
 
 
 builder.Services.AddControllers();
@@ -80,20 +50,11 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReportManagement API", Version = "v1" });
 });
 
-builder.Services.AddScoped<IReportRepository, ReportRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IOTPRepository, OTPRepository>();
-
 builder.Services.AddSingleton<RedisSlidingWindowLimiter>(sp =>
 {
     var redis = RedisConnectionHelper.Connection;
     return new RedisSlidingWindowLimiter(redis);
 });
-
-
-
-
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateReportCommandHandler).Assembly));
 
 var app = builder.Build();
 
