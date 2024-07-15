@@ -17,9 +17,9 @@ public class ReportManagementModuleRegistration : IModuleRegistration
         var connectionString = ConnectionStringParser.ConvertToNpgsqlFormat(configuration["DefaultConnection"]!);
         services.AddDbContext<ReportManagementDbContext>(
             options => options.UseNpgsql(connectionString)
-        );
-        services.AddScoped<IReportRepository, ReportRepository>();
-        services.AddMediatR(cfg =>
+        )
+        .AddScoped<IReportRepository, ReportRepository>()
+        .AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(CreateReportCommand).Assembly);
         });
