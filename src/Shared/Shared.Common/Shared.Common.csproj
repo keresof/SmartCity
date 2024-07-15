@@ -10,6 +10,7 @@
     <Folder Include="Abstract\**" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Remove="Interfaces/ICanMigrate.cs" />
     <Folder Remove="Interfaces/IModuleRegistration.cs" />
   </ItemGroup>
   <ItemGroup>
