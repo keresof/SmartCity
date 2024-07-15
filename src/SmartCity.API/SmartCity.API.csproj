@@ -26,6 +26,7 @@
     <ProjectReference Include="..\Modules\ReportManagement\ReportManagement.Infrastructure\ReportManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\UserManagement\UserManagement.Infrastructure\UserManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\Shared\Shared.Common\Shared.Common.csproj" />
   </ItemGroup>
 
 </Project>
