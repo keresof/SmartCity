@@ -24,5 +24,13 @@ namespace ReportManagement.Infrastructure.Persistence
                 .Property(r => r.Status)
                 .HasConversion<string>();
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Report>()
+                .Property(r => r.Id)
+                .HasColumnType("uuid")
+                .ValueGeneratedOnAdd();
+        }
     }
 }
