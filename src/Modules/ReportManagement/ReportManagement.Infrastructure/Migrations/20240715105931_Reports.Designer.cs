@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReportManagement.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace ReportManagement.Infrastructure.Persistence.Migrations.ReportManagementDb
+namespace ReportManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ReportManagementDbContext))]
-    partial class ReportManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240715105931_Reports")]
+    partial class Reports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,9 +57,8 @@ namespace ReportManagement.Infrastructure.Persistence.Migrations.ReportManagemen
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -66,8 +68,6 @@ namespace ReportManagement.Infrastructure.Persistence.Migrations.ReportManagemen
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Title");
 
                     b.ToTable("Reports");
                 });

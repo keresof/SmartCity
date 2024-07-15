@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ReportManagement.Infrastructure.Persistence.Migrations.ReportManagementDb
+namespace ReportManagement.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Reports : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace ReportManagement.Infrastructure.Persistence.Migrations.ReportManagemen
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     MediaUrl = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -31,11 +31,6 @@ namespace ReportManagement.Infrastructure.Persistence.Migrations.ReportManagemen
                 {
                     table.PrimaryKey("PK_Reports", x => x.Id);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reports_Title",
-                table: "Reports",
-                column: "Title");
         }
 
         /// <inheritdoc />

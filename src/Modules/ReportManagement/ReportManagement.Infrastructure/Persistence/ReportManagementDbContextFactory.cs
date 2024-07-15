@@ -30,7 +30,7 @@ namespace ReportManagement.Infrastructure.Persistence
                     Username = uri.UserInfo.Split(':')[0],
                     Password = uri.UserInfo.Split(':')[1],
                     Database = uri.LocalPath.TrimStart('/'),
-                    SslMode = SslMode.Require
+                    //SslMode = SslMode.Require
                 };
 
                 var parsedConnectionString = nBuilder.ToString();
