@@ -7,7 +7,7 @@ using ReportManagement.Domain.Enums;
 
 namespace ReportManagement.Application.Commands.DeleteReport
 {
-    public class DeleteReportCommandHandler : IRequestHandler<DeleteReportCommand, int>
+    public class DeleteReportCommandHandler : IRequestHandler<DeleteReportCommand, Guid>
     {
         private readonly IReportRepository _reportRepository;
 
@@ -16,7 +16,7 @@ namespace ReportManagement.Application.Commands.DeleteReport
             _reportRepository = reportRepository;
         }
 
-        public async Task<int> Handle(DeleteReportCommand request, CancellationToken cancellationToken)
+        public async Task<Guid> Handle(DeleteReportCommand request, CancellationToken cancellationToken)
         {
             var report = await _reportRepository.GetByIdAsync(request.Id);
 

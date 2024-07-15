@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReportManagement.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace ReportManagement.Infrastructure.Migrations.ReportManagementDb
+namespace ReportManagement.Infrastructure.Persistence.Migrations.ReportManagementDb
 {
     [DbContext(typeof(ReportManagementDbContext))]
-    [Migration("20240713051428_InitialCreate")]
-    partial class InitialCreate
+    partial class ReportManagementDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,16 +24,15 @@ namespace ReportManagement.Infrastructure.Migrations.ReportManagementDb
 
             modelBuilder.Entity("ReportManagement.Domain.Entities.Report", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
@@ -47,6 +43,7 @@ namespace ReportManagement.Infrastructure.Migrations.ReportManagementDb
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastModifiedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Location")
@@ -65,9 +62,8 @@ namespace ReportManagement.Infrastructure.Migrations.ReportManagementDb
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 

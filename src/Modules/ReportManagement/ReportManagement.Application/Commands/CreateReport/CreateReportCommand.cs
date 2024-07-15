@@ -8,4 +8,4 @@ public record CreateReportCommand(
     string Location,
     int Status,
     string MediaUrl,
-    Guid UserId) : IRequest<int>;
+    Guid UserId) : IRequest<Guid>;

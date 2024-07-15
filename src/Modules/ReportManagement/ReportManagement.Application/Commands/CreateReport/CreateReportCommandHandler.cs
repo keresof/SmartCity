@@ -5,7 +5,7 @@ using ReportManagement.Domain.Repositories;
 
 namespace ReportManagement.Application.Commands.CreateReport;
 
-public class CreateReportCommandHandler : IRequestHandler<CreateReportCommand, int>
+public class CreateReportCommandHandler : IRequestHandler<CreateReportCommand, Guid>
 {
     private readonly IReportRepository _reportRepository;
 
@@ -14,7 +14,7 @@ public class CreateReportCommandHandler : IRequestHandler<CreateReportCommand, i
         _reportRepository = reportRepository;
     }
 
-    public async Task<int> Handle(CreateReportCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreateReportCommand request, CancellationToken cancellationToken)
     {
         var report = new Report
         {
@@ -26,8 +26,8 @@ public class CreateReportCommandHandler : IRequestHandler<CreateReportCommand, i
             UserId = request.UserId
         };
 
-        report.SetCreatedBy(request.UserId.ToString());
-        report.SetLastModifiedBy(request.UserId.ToString());
+        report.CreatedBy = request.UserId.ToString();
+        report.Updated(request.UserId.ToString(), report.Created);
 
         await _reportRepository.AddAsync(report);
 

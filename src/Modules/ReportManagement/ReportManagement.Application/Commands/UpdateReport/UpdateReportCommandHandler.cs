@@ -5,7 +5,7 @@ using Shared.Common.Exceptions;
 
 namespace ReportManagement.Application.Commands.UpdateReport;
 
-public class UpdateReportCommandHandler : IRequestHandler<UpdateReportCommand, int>
+public class UpdateReportCommandHandler : IRequestHandler<UpdateReportCommand, Guid>
 {
     private readonly IReportRepository _reportRepository;
 
@@ -14,7 +14,7 @@ public class UpdateReportCommandHandler : IRequestHandler<UpdateReportCommand, i
         _reportRepository = reportRepository;
     }
 
-    public async Task<int> Handle(UpdateReportCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(UpdateReportCommand request, CancellationToken cancellationToken)
     {
         var report = await _reportRepository.GetByIdAsync(request.Id);
 
@@ -25,7 +25,7 @@ public class UpdateReportCommandHandler : IRequestHandler<UpdateReportCommand, i
         report.Location = request.Location;
         report.Status = (ReportStatus)request.Status;
         report.MediaUrl = request.MediaUrl;
-        report.SetLastModifiedBy(request.OfficerId.ToString());
+        report.Updated(request.OfficerId.ToString());
 
         await _reportRepository.UpdateAsync(report);
 

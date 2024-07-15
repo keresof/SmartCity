@@ -3,4 +3,4 @@ using ReportManagement.Application.DTOs;
 
 namespace ReportManagement.Application.Queries.GetReportById;
 
-public record GetReportByIdQuery(int Id) : IRequest<ReportDto>;
+public record GetReportByIdQuery(Guid Id) : IRequest<ReportDto>;

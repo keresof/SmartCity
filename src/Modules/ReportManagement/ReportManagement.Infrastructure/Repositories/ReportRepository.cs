@@ -21,7 +21,7 @@ namespace ReportManagement.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Report> GetByIdAsync(int id)
+        public async Task<Report> GetByIdAsync(Guid id)
         {
             return await _context.Reports.FindAsync(id);
         }
@@ -38,7 +38,7 @@ namespace ReportManagement.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(Guid id)
         {
             var report = await _context.Reports.FindAsync(id);
             if (report != null)
