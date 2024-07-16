@@ -22,10 +22,10 @@ namespace UserManagement.Infrastructure.Services
             _userRepository = userRepository;
         }
 
-        public async Task<string> GenerateOTPAsync(string userId, OTPPurpose purpose)
+        public async Task<string> GenerateOTPAsync(string userId, OTPPurpose purpose, OTPDeliveryMethod method)
         {
             string code = GenerateOTPCode();
-            var otp = OTP.Create(userId, code, DateTime.UtcNow.AddMinutes(5), purpose);
+            var otp = OTP.Create(userId, code, DateTime.UtcNow.AddMinutes(5), purpose, method);
             await _otpRepository.AddAsync(otp);
             await _otpRepository.SaveChangesAsync();
             return code;

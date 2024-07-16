@@ -57,6 +57,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSingleton<RedisSlidingWindowLimiter>(sp =>
 {
+    RedisConnectionHelper.InitializeConnection(builder.Configuration);
     var redis = RedisConnectionHelper.Connection;
     return new RedisSlidingWindowLimiter(redis);
 });
@@ -68,6 +69,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var migrators = ModuleDiscovery.DiscoverModules<ICanMigrate>().ToList();
+    Console.WriteLine($"Discovered {migrators.Count} migrators");
     foreach (var migrator in migrators)
     {
         try{

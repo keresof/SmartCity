@@ -1,8 +1,7 @@
-using ReportManagement.Infrastructure.Persistence;
 using Shared.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace ReportManagement.Infrastructure.DependencyInjection;
+namespace ReportManagement.Infrastructure.Persistence;
 
 public class ReportManagementModuleMigration : ICanMigrate
 {
