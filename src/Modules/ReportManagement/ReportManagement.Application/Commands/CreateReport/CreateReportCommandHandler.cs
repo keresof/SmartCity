@@ -23,7 +23,8 @@ public class CreateReportCommandHandler : IRequestHandler<CreateReportCommand, G
             Location = request.Location,
             Status = (ReportStatus)request.Status,
             MediaUrl = request.MediaUrl,
-            UserId = request.UserId
+            UserId = request.UserId,
+            Coordinates = request.Coordinates
         };
 
         report.CreatedBy = request.UserId.ToString();
