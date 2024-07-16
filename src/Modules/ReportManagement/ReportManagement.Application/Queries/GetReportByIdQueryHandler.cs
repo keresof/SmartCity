@@ -36,7 +36,8 @@ namespace ReportManagement.Application.Queries.GetReportById
                 report.UserId,
                 report.LastModified,
                 report.LastModifiedBy,
-                report.CreatedBy
+                report.CreatedBy,
+                report.Coordinates
             );
         }
     }

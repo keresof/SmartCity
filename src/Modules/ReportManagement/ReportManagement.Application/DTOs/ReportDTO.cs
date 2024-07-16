@@ -6,12 +6,13 @@ public record ReportDto(
     Guid Id,
     string Title,
     string Description,
-    string Location,
+    string[] Location,
     ReportStatus Status,
     DateTime Created,
     string MediaUrl,
     Guid UserId,
     DateTime? LastModified,
     string LastModifiedBy,
-    string CreatedBy
+    string CreatedBy,
+    decimal[] Coordinates
 );
