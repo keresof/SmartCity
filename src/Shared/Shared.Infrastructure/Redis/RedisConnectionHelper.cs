@@ -19,7 +19,7 @@ namespace Shared.Infrastructure.Redis
         {
             lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
             {
-                string connectionString = configuration.GetConnectionString("Redis");
+                string connectionString = configuration["Redis"];
                 return ConnectionMultiplexer.Connect(connectionString);
             });
         }

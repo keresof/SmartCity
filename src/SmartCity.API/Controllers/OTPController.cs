@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using UserManagement.Application.Commands;
+using UserManagement.Application.Commands.SendOTP;
 using MediatR;
 using Shared.Infrastructure.RateLimiting;
 using System;

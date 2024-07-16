@@ -11,11 +11,12 @@ namespace UserManagement.Domain.Entities
         public string Code { get; private set; }
         public DateTime ExpiryTime { get; private set; }
         public OTPPurpose Purpose { get; private set; }
+        public OTPDeliveryMethod DeliveryMethod { get; private set; }
         public bool IsUsed { get; private set; }
 
         private OTP() { } // For EF Core
 
-        public static OTP Create(string userId, string code, DateTime expiryTime, OTPPurpose purpose)
+        public static OTP Create(string userId, string code, DateTime expiryTime, OTPPurpose purpose, OTPDeliveryMethod deliveryMethod)
         {
             return new OTP
             {
@@ -23,7 +24,8 @@ namespace UserManagement.Domain.Entities
                 Code = code,
                 ExpiryTime = expiryTime,
                 Purpose = purpose,
-                IsUsed = false
+                IsUsed = false,
+                DeliveryMethod = deliveryMethod
             };
         }
 
