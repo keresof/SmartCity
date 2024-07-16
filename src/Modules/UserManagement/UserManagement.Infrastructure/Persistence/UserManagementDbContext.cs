@@ -9,6 +9,8 @@ namespace UserManagement.Infrastructure.Persistence
     {
         public DbSet<User> Users { get; set; }
         public DbSet<OTP> OTPs { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
 
         public UserManagementDbContext(DbContextOptions<UserManagementDbContext> options)
             : base(options)
