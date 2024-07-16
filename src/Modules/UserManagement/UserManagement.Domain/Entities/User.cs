@@ -12,15 +12,15 @@ namespace UserManagement.Domain.Entities
         public string? MicrosoftId { get; private set; }
         public string? FacebookId { get; private set; }
         public string? PhoneNumber { get; private set; }
-        public string? PasswordHash { get; private set; }
+        public Password PasswordHash { get; private set; }
         public string? RefreshToken { get; private set; }
         public DateTime? RefreshTokenExpiryTime { get; private set; }
         public string? ResetPasswordToken { get; private set; }
         public DateTime? ResetPasswordTokenExpiryTime { get; private set; }
         public bool IsEmailVerified { get; private set; }
         public bool IsPhoneNumberVerified { get; private set; }
-        public bool IsActive { get; private set; }
-        public bool IsDeleted { get; private set; }
+        public bool IsActive { get; private set; } = true;
+        public bool IsDeleted { get; private set; } = false;
         public List<AuthenticationMethod> AuthenticationMethods { get; private set; } = new List<AuthenticationMethod>();
 
         private User() { } // For EF Core
@@ -47,7 +47,7 @@ namespace UserManagement.Domain.Entities
 
         public void SetPasswordHash(string passwordHash)
         {
-            PasswordHash = passwordHash;
+            PasswordHash = Password.Create(passwordHash);
             AddAuthenticationMethod(AuthenticationMethod.EmailPassword);
         }
 

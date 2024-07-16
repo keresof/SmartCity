@@ -30,6 +30,19 @@ namespace UserManagement.Infrastructure.Persistence
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries)
                          .Select(e => Enum.Parse<AuthenticationMethod>(e))
                          .ToList());
+
+            modelBuilder.Entity<User>()
+                .OwnsOne(u =>u.PasswordHash, ph => 
+                {
+                    ph.Property(p => p.Hash).HasColumnName("PasswordHash");
+                });
+                         
+            modelBuilder.Entity<Role>()
+                .HasIndex(r => r.Name)
+                .IsUnique();
+            modelBuilder.Entity<Permission>()
+                .HasIndex(p => p.Name)
+                .IsUnique();
         }
     }
 }

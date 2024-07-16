@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Shared.Common.Abstract;
 
 public class Password : ValueObject
@@ -21,14 +22,25 @@ public class Password : ValueObject
 
     private static string HashPassword(string password)
     {
-        // Implement secure password hashing (e.g., using BCrypt)
-        throw new NotImplementedException();
+        var nonce = RandomNumberGenerator.GetBytes(16);
+        var pbkdf2 = new Rfc2898DeriveBytes(password, nonce, 10000, HashAlgorithmName.SHA256);
+        var hash = pbkdf2.GetBytes(32);
+        return Convert.ToBase64String(hash) + '.' + Convert.ToBase64String(nonce);
     }
 
-    private static bool VerifyPassword(string password, string hash)
+    private static bool VerifyPassword(string password, string storedHash)
     {
-        // Implement secure password verification
-        throw new NotImplementedException();
+        var parts = storedHash.Split('.');
+        if (parts.Length != 2)
+            return false;
+
+        var hash = Convert.FromBase64String(parts[0]);
+        var nonce = Convert.FromBase64String(parts[1]);
+
+        var pbkdf2 = new Rfc2898DeriveBytes(password, nonce, 10000, HashAlgorithmName.SHA256);
+        var testHash = pbkdf2.GetBytes(32);
+
+        return hash.SequenceEqual(testHash);
     }
 
     protected override IEnumerable<object> GetAtomicValues()
