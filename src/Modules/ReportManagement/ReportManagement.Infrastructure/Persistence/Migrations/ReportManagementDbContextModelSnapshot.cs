@@ -8,7 +8,7 @@ using ReportManagement.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace ReportManagement.Infrastructure.Migrations
+namespace ReportManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ReportManagementDbContext))]
     partial class ReportManagementDbContextModelSnapshot : ModelSnapshot
@@ -54,9 +54,9 @@ namespace ReportManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text[]");
 
-                    b.Property<string>("MediaUrl")
+                    b.Property<string[]>("MediaUrls")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text[]");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");

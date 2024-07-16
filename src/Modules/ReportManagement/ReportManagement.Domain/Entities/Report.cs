@@ -8,11 +8,11 @@ namespace ReportManagement.Domain.Entities
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public string[] Location { get; set; }
+        public string[] Location { get; set; } = [];
         public ReportStatus Status { get; set; }
-        public string MediaUrl { get; set; }
+        public string[] MediaUrls { get; set; } = [];
         public Guid UserId { get; set; }
         
-        public decimal[] Coordinates { get; set; }
+        public decimal[] Coordinates { get; set; } = [];
     }
 }
