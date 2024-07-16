@@ -3,7 +3,7 @@ using UserManagement.Domain.Entities;
 using UserManagement.Domain.Enums;
 
 
-namespace UserManagement.Application.Commands
+namespace UserManagement.Application.Commands.SendOTP
 {
     public class SendOTPCommand : IRequest<SendOTPResult>
     {

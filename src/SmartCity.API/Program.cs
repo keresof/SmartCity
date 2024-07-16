@@ -18,6 +18,7 @@ using System;
 using System.IO;
 using Npgsql;
 using Shared.Common.Interfaces;
+using Shared.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,9 +38,13 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-foreach (var module in ModuleDiscovery.DiscoverModules())
+var modules = ModuleDiscovery.DiscoverModules<IModuleRegistration>().ToList();
+Console.WriteLine($"Discovered {modules.Count} modules");
+
+foreach (var module in modules)
 {
-    module?.RegisterModule(builder.Services, builder.Configuration);
+    Console.WriteLine($"Registering module: {module.GetType().Name}");
+    module.RegisterModule(builder.Services, builder.Configuration);
 }
 
 
@@ -52,6 +57,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSingleton<RedisSlidingWindowLimiter>(sp =>
 {
+    RedisConnectionHelper.InitializeConnection(builder.Configuration);
     var redis = RedisConnectionHelper.Connection;
     return new RedisSlidingWindowLimiter(redis);
 });
@@ -62,15 +68,18 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try
+    var migrators = ModuleDiscovery.DiscoverModules<ICanMigrate>().ToList();
+    Console.WriteLine($"Discovered {migrators.Count} migrators");
+    foreach (var migrator in migrators)
     {
-        var context = services.GetRequiredService<ReportManagementDbContext>();
-        context.Database.Migrate();
-        Console.WriteLine("Migrations applied successfully.");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"An error occurred while applying migrations: {ex.Message}");
+        try{
+            Console.WriteLine($"Applying migrations for {migrator.GetType().Name}");
+            migrator.ApplyMigrations(services);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error applying migrations for {migrator.GetType().Name}: {ex.Message}");
+        }
     }
 }
 

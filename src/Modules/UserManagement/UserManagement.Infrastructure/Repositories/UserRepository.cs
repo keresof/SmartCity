@@ -15,12 +15,12 @@ namespace UserManagement.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<User> GetByIdAsync(string id)
+        public async Task<User?> GetByIdAsync(string id)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users.FindAsync(Guid.Parse(id));
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<User?> GetByEmailAsync(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }

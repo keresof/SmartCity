@@ -15,8 +15,7 @@ public class ReportManagementModuleRegistration : IModuleRegistration
     public void RegisterModule(IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = ConnectionStringParser.ConvertToNpgsqlFormat(configuration["DefaultConnection"]!);
-        services
-        .AddDbContext<ReportManagementDbContext>(
+        services.AddDbContext<ReportManagementDbContext>(
             options => options.UseNpgsql(connectionString)
         )
         .AddScoped<IReportRepository, ReportRepository>()
