@@ -34,7 +34,7 @@ namespace UserManagement.Infrastructure.Persistence
             modelBuilder.Entity<User>()
                 .OwnsOne(u =>u.PasswordHash, ph => 
                 {
-                    ph.Property(p => p.Hash).HasColumnName("PasswordHash");
+                    ph.Property(p => p.Hash).HasColumnName("PasswordHash").IsRequired(false);
                 });
                          
             modelBuilder.Entity<Role>()
