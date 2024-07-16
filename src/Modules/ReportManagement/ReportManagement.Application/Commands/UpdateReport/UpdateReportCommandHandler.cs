@@ -25,6 +25,7 @@ public class UpdateReportCommandHandler : IRequestHandler<UpdateReportCommand, G
         report.Location = request.Location;
         report.Status = (ReportStatus)request.Status;
         report.MediaUrl = request.MediaUrl;
+        report.Coordinates = request.Coordinates;
         report.Updated(request.OfficerId.ToString());
 
         await _reportRepository.UpdateAsync(report);
