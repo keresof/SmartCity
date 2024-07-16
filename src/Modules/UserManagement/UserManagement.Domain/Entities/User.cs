@@ -4,6 +4,7 @@ namespace UserManagement.Domain.Entities
 {
     public class User : AuditableEntity
     {
+        public List<UserRole> Roles { get; private set; } = new List<UserRole>();
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string Email { get; private set; }
@@ -92,6 +93,23 @@ namespace UserManagement.Domain.Entities
         {
             ResetPasswordToken = null;
             ResetPasswordTokenExpiryTime = null;
+        }
+
+        public void AddRole(Role role)
+        {
+            if (!Roles.Any(r => r.RoleId == role.Id))
+            {
+                Roles.Add(new UserRole { UserId = this.Id, RoleId = role.Id });
+            }
+        }
+
+        public void RemoveRole(Role role)
+        {
+            var userRole = Roles.FirstOrDefault(r => r.RoleId == role.Id);
+            if (userRole != null)
+            {
+                Roles.Remove(userRole);
+            }
         }
     }
 }
