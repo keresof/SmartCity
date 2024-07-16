@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReportManagement.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace ReportManagement.Infrastructure.Migrations
+namespace ReportManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ReportManagementDbContext))]
-    partial class ReportManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240716132340_MakeLocationAndCoordinatesSeparate")]
+    partial class MakeLocationAndCoordinatesSeparate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
