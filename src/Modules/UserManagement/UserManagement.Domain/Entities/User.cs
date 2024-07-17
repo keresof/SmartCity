@@ -1,5 +1,6 @@
 using Shared.Common.Abstract;
 using UserManagement.Domain.Enums;
+using UserManagement.Domain.ValueObjects;
 namespace UserManagement.Domain.Entities
 {
     public class User : AuditableEntity

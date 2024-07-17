@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using Shared.Common.Abstract;
 
+namespace UserManagement.Domain.ValueObjects;
 public class Password : ValueObject
 {
     public string Hash { get; private set; }
@@ -9,6 +10,9 @@ public class Password : ValueObject
 
     public static Password Create(string plainTextPassword)
     {
+        // Ensure password is not null or empty
+        if (string.IsNullOrEmpty(plainTextPassword))
+            throw new ArgumentException("Password cannot be null or empty");
         // Implement password hashing logic
         string hash = HashPassword(plainTextPassword);
         return new Password { Hash = hash };
@@ -16,6 +20,8 @@ public class Password : ValueObject
 
     public bool Verify(string plainTextPassword)
     {
+        if (string.IsNullOrEmpty(plainTextPassword))
+            return false;
         // Implement password verification logic
         return VerifyPassword(plainTextPassword, Hash);
     }
