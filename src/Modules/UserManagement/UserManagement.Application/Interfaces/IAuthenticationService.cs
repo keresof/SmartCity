@@ -8,4 +8,5 @@ public interface IAuthenticationService
     Task<AuthenticationResult> AuthenticateAsync(string email, string password);
     Task<AuthenticationResult> AuthenticateWithExternalProviderAsync(string provider, string token);
     Task<AuthenticationResult> RefreshTokenAsync(string token, string refreshToken);
+    Task LogoutAsync(string token);
 }

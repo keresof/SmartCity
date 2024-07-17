@@ -46,9 +46,9 @@ namespace UserManagement.Domain.Entities
             }
         }
 
-        public void SetPasswordHash(string passwordHash)
+        public void SetPasswordHash(string plainTextPassword)
         {
-            PasswordHash = Password.Create(passwordHash);
+            PasswordHash = Password.Create(plainTextPassword);
             AddAuthenticationMethod(AuthenticationMethod.EmailPassword);
         }
 
@@ -78,7 +78,7 @@ namespace UserManagement.Domain.Entities
             IsEmailVerified = true;
         }
 
-        public void SetRefreshToken(string token, DateTime expiryTime)
+        public void SetRefreshToken(string? token, DateTime expiryTime)
         {
             RefreshToken = token;
             RefreshTokenExpiryTime = expiryTime;

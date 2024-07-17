@@ -38,6 +38,8 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
+RedisConnectionHelper.InitializeConnection(builder.Configuration);
+
 var modules = ModuleDiscovery.DiscoverModules<IModuleRegistration>().ToList();
 Console.WriteLine($"Discovered {modules.Count} modules");
 
@@ -55,12 +57,13 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReportManagement API", Version = "v1" });
 });
 
+var redis = RedisConnectionHelper.Connection;
+
 builder.Services.AddSingleton<RedisSlidingWindowLimiter>(sp =>
 {
-    RedisConnectionHelper.InitializeConnection(builder.Configuration);
-    var redis = RedisConnectionHelper.Connection;
     return new RedisSlidingWindowLimiter(redis);
 });
+
 
 var app = builder.Build();
 

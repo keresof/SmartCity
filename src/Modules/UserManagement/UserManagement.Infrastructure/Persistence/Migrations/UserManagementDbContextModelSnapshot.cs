@@ -22,37 +22,6 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("UserManagement.Domain.Entities.OTP", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("DeliveryMethod")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("ExpiryTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Purpose")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OTPs");
-                });
-
             modelBuilder.Entity("UserManagement.Domain.Entities.Permission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -268,7 +237,7 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("UserManagement.Domain.Entities.User", b =>
                 {
-                    b.OwnsOne("Password", "PasswordHash", b1 =>
+                    b.OwnsOne("UserManagement.Domain.ValueObjects.Password", "PasswordHash", b1 =>
                         {
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("uuid");

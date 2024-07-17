@@ -12,8 +12,8 @@ using UserManagement.Infrastructure.Persistence;
 namespace UserManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(UserManagementDbContext))]
-    [Migration("20240716120804_AddRolesAndPermissions")]
-    partial class AddRolesAndPermissions
+    [Migration("20240717032758_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,37 +24,6 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("UserManagement.Domain.Entities.OTP", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("DeliveryMethod")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("ExpiryTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Purpose")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OTPs");
-                });
 
             modelBuilder.Entity("UserManagement.Domain.Entities.Permission", b =>
                 {
@@ -85,6 +54,9 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Permissions");
                 });
@@ -118,6 +90,9 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Roles");
                 });
@@ -200,9 +175,6 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                     b.Property<string>("MicrosoftId")
                         .HasColumnType("text");
 
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
@@ -264,6 +236,28 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                     b.Navigation("Permission");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("UserManagement.Domain.Entities.User", b =>
+                {
+                    b.OwnsOne("UserManagement.Domain.ValueObjects.Password", "PasswordHash", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Hash")
+                                .HasColumnType("text")
+                                .HasColumnName("PasswordHash");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("PasswordHash");
                 });
 
             modelBuilder.Entity("UserManagement.Domain.Entities.UserRole", b =>
