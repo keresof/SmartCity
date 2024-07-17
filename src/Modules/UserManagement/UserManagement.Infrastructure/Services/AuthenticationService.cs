@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using UserManagement.Domain.Entities;
 using Microsoft.Extensions.Configuration;
+using UserManagement.Domain.Enums;
 
 namespace UserManagement.Infrastructure.Services;
 
@@ -41,10 +42,14 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
             return new AuthenticationResult { Success = false, Errors = ["Invalid credentials"] };
         }
 
+        if(!user.AuthenticationMethods.Any(m => m == AuthenticationMethod.EmailPassword)){
+            return new AuthenticationResult { Success = false, Errors = ["Email is already registered. Use a different login method or issue an OTP to add new login method to account."] };
+        }
+
         var accessToken = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(7));
+        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<int>("RefreshTokenExpiry")));
         await _userRepository.UpdateAsync(user);
 
         return new AuthenticationResult
@@ -67,13 +72,14 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
         var externalId = authenticateResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         var email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
         var name = authenticateResult.Principal.FindFirstValue(ClaimTypes.Name);
+        var firstName = authenticateResult.Principal.FindFirstValue(ClaimTypes.GivenName);
         var lastName = authenticateResult.Principal.FindFirstValue(ClaimTypes.Surname);
 
-        var user = await _userRepository.GetByExternalProviderIdAsync(externalId, provider);
+        var user = await _userRepository.GetByEmailAsync(email);
 
         if (user == null)
         {
-            user = User.Create(name, lastName, email);
+            user = User.Create(firstName?? name, lastName, email);
             user.SetOAuthId(provider, externalId);
             await _userRepository.AddAsync(user);
         }
@@ -81,12 +87,19 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
         {
             if(!user.HasOAuthId(provider)){
                 // Email is registered with a different provider or password
-                // Challenge the user with an OTP
-                return new AuthenticationResult { Success = false, Errors = ["Email is registered with a different provider"] };
+                // Controller should issue an OTP to add new login method to account
+                return new AuthenticationResult { Success = false, Errors = ["Email is already registered. Use a different login method or issue an OTP to add new login method to account."] };
             }
+            if (user.GetOAuthId(provider) != externalId)
+            {
+                // Email is registered with a different external account
+                return new AuthenticationResult { Success = false, Errors = ["Email is already registered with a different external account from the same provider."] };
+            }
+            // Update the user's name and last name if not present
+            user.SetFirstName(firstName?? user.FirstName);
+            user.SetLastName(lastName?? user.LastName);
             await _userRepository.UpdateAsync(user);
         }
-
         var accessToken = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
 

@@ -52,6 +52,17 @@ namespace UserManagement.Domain.Entities
             AddAuthenticationMethod(AuthenticationMethod.EmailPassword);
         }
 
+        public string GetOAuthId(string provider)
+        {
+            return provider.ToLower() switch
+            {
+                "google" => GoogleId,
+                "microsoft" => MicrosoftId,
+                "facebook" => FacebookId,
+                _ => throw new ArgumentException("Invalid OAuth provider", nameof(provider))
+            };
+        }
+
         public void SetOAuthId(string provider, string id)
         {
             switch (provider.ToLower())
@@ -127,6 +138,45 @@ namespace UserManagement.Domain.Entities
             {
                 Roles.Remove(userRole);
             }
+        }
+        public void SetFirstName(string firstName)
+        {
+            FirstName = firstName;
+        }
+
+        public void SetLastName(string lastName)
+        {
+            LastName = lastName;
+        }
+
+        public void SetPhoneNumber(string phoneNumber)
+        {
+            PhoneNumber = phoneNumber;
+        }
+
+        public void VerifyPhoneNumber()
+        {
+            IsPhoneNumberVerified = true;
+        }
+
+        public void Activate()
+        {
+            IsActive = true;
+        }
+
+        public void Deactivate()
+        {
+            IsActive = false;
+        }
+
+        public void Delete()
+        {
+            IsDeleted = true;
+        }
+
+        public void Restore()
+        {
+            IsDeleted = false;
         }
     }
 }
