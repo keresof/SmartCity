@@ -4,20 +4,33 @@ using UserManagement.Application.DTOs;
 using UserManagement.Application.Interfaces;
 using Microsoft.IdentityModel.JsonWebTokens;
 
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using UserManagement.Domain.Entities;
+using Microsoft.Extensions.Configuration;
+
 namespace UserManagement.Infrastructure.Services;
 
-public class AuthenticationService : IAuthenticationService
+public class AuthenticationService : Application.Interfaces.IAuthenticationService
 {
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
     private readonly IConnectionMultiplexer _redis;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IConfiguration _configuration;
     private const string BlacklistPrefix = "blacklisted_token:";
 
-    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis)
+    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
         _redis = redis;
+        _httpContextAccessor = httpContextAccessor;
+        _configuration = configuration;
     }
 
     public async Task<AuthenticationResult> AuthenticateAsync(string email, string password)
@@ -42,9 +55,50 @@ public class AuthenticationService : IAuthenticationService
         };
     }
 
-    public Task<AuthenticationResult> AuthenticateWithExternalProviderAsync(string provider, string token)
+    public async Task<AuthenticationResult> AuthenticateWithExternalProviderAsync(string provider, string token)
     {
-        throw new NotImplementedException();
+        var authenticateResult = await AuthenticateTokenAsync(provider, token);
+        
+        if (!authenticateResult.Succeeded)
+        {
+            return new AuthenticationResult { Success = false, Errors = ["Invalid external token"] };
+        }
+
+        var externalId = authenticateResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        var email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
+        var name = authenticateResult.Principal.FindFirstValue(ClaimTypes.Name);
+        var lastName = authenticateResult.Principal.FindFirstValue(ClaimTypes.Surname);
+
+        var user = await _userRepository.GetByExternalProviderIdAsync(externalId, provider);
+
+        if (user == null)
+        {
+            user = User.Create(name, lastName, email);
+            user.SetOAuthId(provider, externalId);
+            await _userRepository.AddAsync(user);
+        }
+        else
+        {
+            if(!user.HasOAuthId(provider)){
+                // Email is registered with a different provider or password
+                // Challenge the user with an OTP
+                return new AuthenticationResult { Success = false, Errors = ["Email is registered with a different provider"] };
+            }
+            await _userRepository.UpdateAsync(user);
+        }
+
+        var accessToken = _tokenService.CreateAccessToken(user);
+        var refreshToken = _tokenService.CreateRefreshToken();
+
+        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(Convert.ToUInt32(_configuration["RefreshTokenExpiry"])));
+        await _userRepository.UpdateAsync(user);
+
+        return new AuthenticationResult
+        {
+            Success = true,
+            Token = accessToken,
+            RefreshToken = refreshToken
+        };
     }
 
     public async Task LogoutAsync(string token)
@@ -95,7 +149,7 @@ public class AuthenticationService : IAuthenticationService
         var newAccessToken = _tokenService.CreateAccessToken(user);
         var newRefreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(7));
+        user.SetRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<int>("RefreshTokenExpiry")));
         await _userRepository.UpdateAsync(user);
 
         return new AuthenticationResult
@@ -122,5 +176,21 @@ public class AuthenticationService : IAuthenticationService
         return await db.KeyExistsAsync($"{BlacklistPrefix}{token}");
     }
 
-    // Implement external provider authentication methods here
+    private async Task<AuthenticateResult> AuthenticateTokenAsync(string provider, string token)
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        
+        httpContext.Request.Headers["Authorization"] = $"Bearer {token}";
+
+        AuthenticateResult result = provider.ToLower() switch
+        {
+            "google" => await httpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme),
+            "microsoft" => await httpContext.AuthenticateAsync(MicrosoftAccountDefaults.AuthenticationScheme),
+            "facebook" => await httpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme),
+            _ => throw new NotSupportedException($"Provider {provider} is not supported.")
+        };
+
+        return result;
+    }
+
 }

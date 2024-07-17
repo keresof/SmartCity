@@ -1,5 +1,6 @@
 namespace UserManagement.Infrastructure.DependencyInjection;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ public class UserManagementModuleRegistration : IModuleRegistration
             return new RedisOTPService(redis);
         })
         .AddScoped<IAuthenticationService, AuthenticationService>(s => {
-            return new AuthenticationService(s.GetRequiredService<IUserRepository>(), s.GetRequiredService<ITokenService>(), redis);
+            return new AuthenticationService(s.GetRequiredService<IUserRepository>(), s.GetRequiredService<ITokenService>(), redis,s.GetRequiredService<IHttpContextAccessor>(), configuration);
         })
         .AddMediatR(cfg =>
         {

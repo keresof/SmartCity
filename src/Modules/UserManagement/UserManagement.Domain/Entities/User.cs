@@ -73,6 +73,22 @@ namespace UserManagement.Domain.Entities
             }
         }
 
+        public bool HasOAuthId(string provider)
+        {
+            return provider.ToLower() switch
+            {
+                "google" => GoogleId != null,
+                "microsoft" => MicrosoftId != null,
+                "facebook" => FacebookId != null,
+                _ => false
+            };
+        }
+
+        public bool HasPassword()
+        {
+            return PasswordHash != null;
+        }
+
         public void VerifyEmail()
         {
             IsEmailVerified = true;
