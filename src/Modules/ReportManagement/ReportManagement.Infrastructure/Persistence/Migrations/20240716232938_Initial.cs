@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ReportManagement.Infrastructure.Migrations
+namespace ReportManagement.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Reports : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,10 +18,11 @@ namespace ReportManagement.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Location = table.Column<string>(type: "text", nullable: false),
+                    Location = table.Column<string[]>(type: "text[]", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    MediaUrl = table.Column<string>(type: "text", nullable: false),
+                    MediaUrls = table.Column<string[]>(type: "text[]", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Coordinates = table.Column<decimal[]>(type: "numeric[]", nullable: false),
                     Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: false),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

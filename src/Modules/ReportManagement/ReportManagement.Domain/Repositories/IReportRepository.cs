@@ -7,7 +7,7 @@ namespace ReportManagement.Domain.Repositories
 {
     public interface IReportRepository
     {
-        Task<Report> GetByIdAsync(Guid id);
+        Task<Report?> GetByIdAsync(Guid id);
         Task AddAsync(Report report);
         Task UpdateAsync(Report report);
         Task DeleteAsync(Guid id);

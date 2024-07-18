@@ -27,7 +27,7 @@ namespace ReportManagement.Application.Queries.SearchReports
                 report.Location,
                 report.Status,
                 report.Created,
-                report.MediaUrl,
+                report.MediaUrls,
                 report.UserId,
                 report.LastModified,
                 report.LastModifiedBy,

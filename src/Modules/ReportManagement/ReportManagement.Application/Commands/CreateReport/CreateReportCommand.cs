@@ -7,6 +7,6 @@ public record CreateReportCommand(
     string Description,
     string[] Location,
     int Status,
-    string MediaUrl,
+    string[] MediaUrls,
     decimal[] Coordinates,
     Guid UserId) : IRequest<Guid>;

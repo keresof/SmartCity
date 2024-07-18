@@ -8,6 +8,6 @@ public record UpdateReportCommand(
     string Description,
     string[] Location,
     int Status,
-    string MediaUrl,
+    string[] MediaUrls,
     decimal[] Coordinates,
     Guid OfficerId) : IRequest<Guid>;
