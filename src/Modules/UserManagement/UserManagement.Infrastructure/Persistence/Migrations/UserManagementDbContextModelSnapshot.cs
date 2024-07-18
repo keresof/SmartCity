@@ -32,18 +32,16 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastModified")
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastModifiedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
@@ -68,18 +66,16 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastModified")
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastModifiedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
@@ -129,7 +125,6 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
@@ -158,11 +153,10 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsPhoneNumberVerified")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("LastModified")
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastModifiedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LastName")

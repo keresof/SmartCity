@@ -46,7 +46,7 @@ namespace UserManagement.Domain.Entities
             }
         }
 
-        public void SetPasswordHash(string plainTextPassword)
+        public void SetPassword(string plainTextPassword)
         {
             PasswordHash = Password.Create(plainTextPassword);
             AddAuthenticationMethod(AuthenticationMethod.EmailPassword);

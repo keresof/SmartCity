@@ -1,24 +1,12 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions;
-using ReportManagement.Application.Commands.CreateReport;
-using ReportManagement.Domain.Repositories;
-using ReportManagement.Infrastructure.Repositories;
-using ReportManagement.Infrastructure.Persistence;
-using UserManagement.Infrastructure.Repositories;
-using UserManagement.Infrastructure.Persistence;
-using UserManagement.Application.Interfaces;
-using Shared.Infrastructure;
 using Shared.Infrastructure.RateLimiting;
 using Shared.Infrastructure.Redis;
-using Shared.Infrastructure.Persistence;
 using Shared.Common.DependencyInjection;
 using DotNetEnv;
-using System;
-using System.IO;
-using Npgsql;
 using Shared.Common.Interfaces;
 using Shared.Common;
+using MediatR;
+using Shared.Common.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +37,11 @@ foreach (var module in modules)
     module.RegisterModule(builder.Services, builder.Configuration);
 }
 
+builder.Services.AddMediatR(cfg => 
+{
+    cfg.RegisterServicesFromAssembly(typeof(ValidationBehavior<,>).Assembly);
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

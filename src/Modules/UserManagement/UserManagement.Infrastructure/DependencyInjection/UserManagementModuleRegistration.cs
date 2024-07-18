@@ -1,14 +1,19 @@
 namespace UserManagement.Infrastructure.DependencyInjection;
 
+using System.Reflection;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Common.Behaviors;
 using Shared.Common.Interfaces;
 using Shared.Common.Utilities;
 using Shared.Infrastructure.Redis;
+using UserManagement.Application.Commands.RegisterUser;
 using UserManagement.Application.Commands.SendOTP;
 using UserManagement.Application.Interfaces;
 using UserManagement.Infrastructure.Persistence;
@@ -40,9 +45,12 @@ public class UserManagementModuleRegistration : IModuleRegistration
         {
             return new AuthenticationService(s.GetRequiredService<IUserRepository>(), s.GetRequiredService<ITokenService>(), redis, s.GetRequiredService<IHttpContextAccessor>(), configuration);
         })
+        .AddValidatorsFromAssembly(typeof(RegisterUserCommandValidator).Assembly)
         .AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(SendOTPCommand).Assembly);
+            cfg.RegisterServicesFromAssembly(typeof(ValidationBehavior<,>).Assembly);
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
 
         var tokenService = services.BuildServiceProvider().GetRequiredService<ITokenService>();
@@ -56,7 +64,7 @@ public class UserManagementModuleRegistration : IModuleRegistration
             })
         .AddJwtBearer(opts =>
         {
-            opts.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            opts.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
