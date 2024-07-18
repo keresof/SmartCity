@@ -49,8 +49,6 @@ public class UserManagementModuleRegistration : IModuleRegistration
         .AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(SendOTPCommand).Assembly);
-            cfg.RegisterServicesFromAssembly(typeof(ValidationBehavior<,>).Assembly);
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
 
         var tokenService = services.BuildServiceProvider().GetRequiredService<ITokenService>();
