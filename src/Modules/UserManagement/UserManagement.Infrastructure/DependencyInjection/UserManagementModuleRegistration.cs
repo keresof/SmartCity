@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Common.Behaviors;
 using Shared.Common.Interfaces;
@@ -38,7 +39,7 @@ public class UserManagementModuleRegistration : IModuleRegistration
         .AddScoped<IPermissionRepository, PermissionRepository>()
         .AddScoped<ITokenService, JwtTokenService>(s =>
         {
-            return new JwtTokenService(configuration);
+            return new JwtTokenService(configuration, s.GetRequiredService<ILogger<JwtTokenService>>());
         })
         .AddScoped<IOTPService, RedisOTPService>(s =>
         {

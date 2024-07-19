@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using UserManagement.Application.Interfaces;
@@ -14,34 +15,39 @@ public class JwtTokenService : ITokenService
     private readonly RsaSecurityKey _privateKey;
     private readonly RsaSecurityKey _publicKey;
     private readonly JsonWebTokenHandler _tokenHandler;
+    private readonly ILogger<JwtTokenService> _logger;
     public RsaSecurityKey RsaSecurityKey => _publicKey;
 
-    public JwtTokenService(IConfiguration configuration)
+    public JwtTokenService(IConfiguration configuration, ILogger<JwtTokenService> logger)
     {
         _configuration = configuration;
+        _logger = logger;
 
-        // Load RSA keys from configuration or generate new ones
         RSA rsa;
-        if (!string.IsNullOrEmpty(_configuration["JwtPrivateKeyFilepath"]) && File.Exists(_configuration["JwtPrivateKeyFilepath"]))
+        string jwtKeyFilepath = _configuration["JwtPrivateKeyFilepath"] ?? "private_key.pem";
+        string solutionDir = GetSolutionDirectory();
+        string fullPath = Path.Combine(solutionDir, jwtKeyFilepath);
+
+        if (!string.IsNullOrEmpty(jwtKeyFilepath) && File.Exists(fullPath))
         {
             rsa = RSA.Create();
-            using var sr = new StreamReader(_configuration["JwtPrivateKeyFilepath"]);
+            _logger.LogDebug("Loading RSA keys from file");
+            using var sr = new StreamReader(fullPath);
             var pem = sr.ReadToEnd();
             rsa.ImportFromPem(pem);
-            sr.Close();
         }
         else
         {
             rsa = RSA.Create(2048);
-            Console.WriteLine("Generating new RSA keys for JWT token service");
-            rsa.KeySize = 2048;
-            // export to pem format
+            var filepath = _configuration["JwtPrivateKeyFilepath"] ?? "private_key.pem";
+            logger.LogDebug("Generating new RSA keys for JWT token service");
             var pem = rsa.ExportRSAPrivateKeyPem();
             rsa.ImportFromPem(pem);
-            using var sw = new StreamWriter("private_key.pem");
-            sw.Write(pem);
-            sw.Close();
+            string newKeyPath = Path.Combine(solutionDir, "private_key.pem");
+            File.WriteAllText(newKeyPath, pem);
+            logger.LogDebug($"New RSA private key saved to: {newKeyPath}");
         }
+
         _privateKey = new RsaSecurityKey(rsa);
         _publicKey = new RsaSecurityKey(rsa.ExportParameters(false));
 
@@ -111,6 +117,20 @@ public class JwtTokenService : ITokenService
         }
 
         return null;
+    }
+    private string GetSolutionDirectory()
+    {
+        string currentDir = Directory.GetCurrentDirectory();
+        while (!Directory.GetFiles(currentDir, "*.sln").Any())
+        {
+            DirectoryInfo parentDir = Directory.GetParent(currentDir);
+            if (parentDir == null)
+            {
+                throw new DirectoryNotFoundException("Solution directory not found.");
+            }
+            currentDir = parentDir.FullName;
+        }
+        return currentDir;
     }
 }
 
