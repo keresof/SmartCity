@@ -77,20 +77,31 @@ public class AuthController : ControllerBase
     [HttpGet("o/{provider}/cb")]
     public async Task<IActionResult> ExternalLoginCallback(string provider, [FromQuery] string code, [FromQuery] string state)
     {
-        var redirectUri = Url.Action(nameof(ExternalLoginCallback), "Auth", new { provider }, Request.Scheme);
-        var command = new HandleOAuthCallbackCommand
+        try
         {
-            ProviderName = provider,
-            Code = code,
-            State = state,
-            RedirectUri = redirectUri
-        };
+            var redirectUri = Url.Action(nameof(ExternalLoginCallback), "Auth", new { provider }, Request.Scheme);
+            var command = new HandleOAuthCallbackCommand
+            {
+                ProviderName = provider,
+                Code = code,
+                State = state,
+                RedirectUri = redirectUri
+            };
 
-        var result = await _mediator.Send(command);
-        if (result.Success){
-            return Ok(result);
-        }else{
-            return BadRequest(result.Errors);
+            var result = await _mediator.Send(command);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
+        }catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in ExternalLoginCallback for provider: {Provider}", provider);
+            return StatusCode(500, "An unexpected error occurred. Please check server logs.");
         }
+
     }
 }
