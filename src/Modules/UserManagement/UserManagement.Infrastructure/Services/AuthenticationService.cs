@@ -21,16 +21,14 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IConfiguration _configuration;
     private const string BlacklistPrefix = "blacklisted_token:";
 
-    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis,IConfiguration configuration)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
         _redis = redis;
-        _httpContextAccessor = httpContextAccessor;
         _configuration = configuration;
     }
 
@@ -60,52 +58,46 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
         };
     }
 
-    public async Task<AuthenticationResult> AuthenticateWithExternalProviderAsync(string provider, string token)
+   public async Task<AuthenticationResult> AuthenticateWithExternalProviderAsync(string provider, OAuthUserInfo userInfo)
     {
-        var authenticateResult = await AuthenticateTokenAsync(provider, token);
-        
-        if (!authenticateResult.Succeeded)
-        {
-            return new AuthenticationResult { Success = false, Errors = ["Invalid external token"] };
-        }
-
-        var externalId = authenticateResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-        var email = authenticateResult.Principal.FindFirstValue(ClaimTypes.Email);
-        var name = authenticateResult.Principal.FindFirstValue(ClaimTypes.Name);
-        var firstName = authenticateResult.Principal.FindFirstValue(ClaimTypes.GivenName);
-        var lastName = authenticateResult.Principal.FindFirstValue(ClaimTypes.Surname);
+        var externalId = userInfo.Id;
+        var email = userInfo.Email;
+        var name = userInfo.Name;
+        var firstName = userInfo.GivenName;
+        var lastName = userInfo.Surname;
 
         var user = await _userRepository.GetByEmailAsync(email);
 
         if (user == null)
         {
-            user = User.Create(firstName?? name, lastName, email);
+            user = User.Create(firstName ?? name, lastName, email);
             user.SetOAuthId(provider, externalId);
             await _userRepository.AddAsync(user);
         }
         else
         {
-            if(!user.HasOAuthId(provider)){
+            if (!user.HasOAuthId(provider))
+            {
                 // Email is registered with a different provider or password
                 // Controller should issue an OTP to add new login method to account
-                return new AuthenticationResult { Success = false, Errors = ["Email is already registered. Use a different login method or issue an OTP to add new login method to account."] };
+                return new AuthenticationResult { Success = false, Errors = new[] { "Email is already registered. Use a different login method or issue an OTP to add new login method to account." } };
             }
             if (user.GetOAuthId(provider) != externalId)
             {
                 // Email is registered with a different external account
-                return new AuthenticationResult { Success = false, Errors = ["Email is already registered with a different external account from the same provider."] };
+                return new AuthenticationResult { Success = false, Errors = new[] { "Email is already registered with a different external account from the same provider." } };
             }
             // Update the user's name and last name if not present
-            user.SetFirstName(firstName?? user.FirstName);
-            user.SetLastName(lastName?? user.LastName);
+            user.SetFirstName(firstName ?? user.FirstName);
+            user.SetLastName(lastName ?? user.LastName);
             await _userRepository.UpdateAsync(user);
         }
+
         var accessToken = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(Convert.ToUInt32(_configuration["RefreshTokenExpiry"])));
-        await _userRepository.UpdateAsync(user);
-
+        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(_configuration["RefreshTokenExpiry"])));
+        await _userRepository.SaveChangesAsync();
         return new AuthenticationResult
         {
             Success = true,
@@ -187,23 +179,6 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
     {
         var db = _redis.GetDatabase();
         return await db.KeyExistsAsync($"{BlacklistPrefix}{token}");
-    }
-
-    private async Task<AuthenticateResult> AuthenticateTokenAsync(string provider, string token)
-    {
-        var httpContext = _httpContextAccessor.HttpContext;
-        
-        httpContext.Request.Headers["Authorization"] = $"Bearer {token}";
-
-        AuthenticateResult result = provider.ToLower() switch
-        {
-            "google" => await httpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme),
-            "microsoft" => await httpContext.AuthenticateAsync(MicrosoftAccountDefaults.AuthenticationScheme),
-            "facebook" => await httpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme),
-            _ => throw new NotSupportedException($"Provider {provider} is not supported.")
-        };
-
-        return result;
     }
 
 }

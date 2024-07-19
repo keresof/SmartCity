@@ -28,6 +28,9 @@ builder.Configuration
 
 RedisConnectionHelper.InitializeConnection(builder.Configuration);
 
+builder.Services.AddLogging();
+builder.Services.AddControllers();
+
 var modules = ModuleDiscovery.DiscoverModules<IModuleRegistration>().ToList();
 Console.WriteLine($"Discovered {modules.Count} modules");
 
@@ -43,7 +46,7 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 });
 
-builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -87,6 +90,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
