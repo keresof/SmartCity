@@ -9,7 +9,7 @@ public record ReportDto(
     string[] Location,
     ReportStatus Status,
     DateTime Created,
-    string MediaUrl,
+    string[] MediaUrls,
     Guid UserId,
     DateTime? LastModified,
     string LastModifiedBy,

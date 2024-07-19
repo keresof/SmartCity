@@ -32,7 +32,7 @@ namespace ReportManagement.Application.Queries.GetReportById
                 report.Location,
                 report.Status,
                 report.Created,
-                report.MediaUrl,
+                report.MediaUrls,
                 report.UserId,
                 report.LastModified,
                 report.LastModifiedBy,
