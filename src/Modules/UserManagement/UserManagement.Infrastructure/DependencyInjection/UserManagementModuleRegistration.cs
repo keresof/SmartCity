@@ -36,7 +36,7 @@ public class UserManagementModuleRegistration : IModuleRegistration
         )
         .AddScoped<ITokenBlacklistService, RedisTokenBlacklistService>(s =>
         {
-            return new RedisTokenBlacklistService(redis);
+            return new RedisTokenBlacklistService(redis, configuration);
         })
         .AddScoped<IUserRepository, UserRepository>()
         .AddScoped<IRoleRepository, RoleRepository>()
