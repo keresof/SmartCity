@@ -52,7 +52,7 @@ public class OAuthService : IOAuthService
             return new AuthenticationResult { Success = false, Errors = new[] { "Invalid state" } };
         }
         var storedProvider = storedState.ToString();
-        if (storedProvider != providerName)
+        if (!storedProvider.Equals(providerName, StringComparison.InvariantCultureIgnoreCase))
         {
             return new AuthenticationResult { Success = false, Errors = new[] { "Provider mismatch" } };
         }
