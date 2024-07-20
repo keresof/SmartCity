@@ -39,5 +39,20 @@ namespace UserManagement.Infrastructure.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public Task<User?> GetByExternalProviderIdAsync(string provider, string id)
+        {
+            switch (provider.ToLower())
+            {
+                case "google":
+                    return _context.Users.FirstOrDefaultAsync(u => u.GoogleId == id);
+                case "microsoft":
+                    return _context.Users.FirstOrDefaultAsync(u => u.MicrosoftId == id);
+                case "facebook":
+                    return _context.Users.FirstOrDefaultAsync(u => u.FacebookId == id);
+                default:
+                    return Task.FromResult<User?>(null);
+            }
+        }
     }
 }

@@ -1,24 +1,15 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions;
-using ReportManagement.Application.Commands.CreateReport;
-using ReportManagement.Domain.Repositories;
-using ReportManagement.Infrastructure.Repositories;
-using ReportManagement.Infrastructure.Persistence;
-using UserManagement.Infrastructure.Repositories;
-using UserManagement.Infrastructure.Persistence;
-using UserManagement.Application.Interfaces;
-using Shared.Infrastructure;
 using Shared.Infrastructure.RateLimiting;
 using Shared.Infrastructure.Redis;
-using Shared.Infrastructure.Persistence;
 using Shared.Common.DependencyInjection;
 using DotNetEnv;
-using System;
-using System.IO;
-using Npgsql;
 using Shared.Common.Interfaces;
 using Shared.Common;
+using MediatR;
+using Shared.Common.Behaviors;
+using SmartCity.API.Middleware;
+using UserManagement.Application.Interfaces;
+using UserManagement.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +29,11 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
+RedisConnectionHelper.InitializeConnection(builder.Configuration);
+
+builder.Services.AddLogging();
+builder.Services.AddControllers();
+
 var modules = ModuleDiscovery.DiscoverModules<IModuleRegistration>().ToList();
 Console.WriteLine($"Discovered {modules.Count} modules");
 
@@ -47,20 +43,43 @@ foreach (var module in modules)
     module.RegisterModule(builder.Services, builder.Configuration);
 }
 
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(ValidationBehavior<,>).Assembly);
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+});
 
-builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReportManagement API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Smart City API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = @"JWT Authorization header using the Bearer scheme. <br /><br /> 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      <br /><br />Example: 'Bearer 12345abcdef'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.OperationFilter<AuthorizeCheckOperationFilter>();
 });
+
+var redis = RedisConnectionHelper.Connection;
 
 builder.Services.AddSingleton<RedisSlidingWindowLimiter>(sp =>
 {
-    RedisConnectionHelper.InitializeConnection(builder.Configuration);
-    var redis = RedisConnectionHelper.Connection;
     return new RedisSlidingWindowLimiter(redis);
 });
+
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
+
 
 var app = builder.Build();
 
@@ -72,7 +91,8 @@ using (var scope = app.Services.CreateScope())
     Console.WriteLine($"Discovered {migrators.Count} migrators");
     foreach (var migrator in migrators)
     {
-        try{
+        try
+        {
             Console.WriteLine($"Applying migrations for {migrator.GetType().Name}");
             migrator.ApplyMigrations(services);
         }
@@ -91,6 +111,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseBlacklistedTokenMiddleware();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

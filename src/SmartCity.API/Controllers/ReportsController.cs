@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReportManagement.Application.Commands.CreateReport;
 using ReportManagement.Application.Commands.DeleteReport;
@@ -10,7 +11,7 @@ using ReportManagement.Application.Queries.SearchReports;
 using Shared.Common.Exceptions;
 
 namespace SmartCity.API.Controllers;
-
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ReportsController : ControllerBase
