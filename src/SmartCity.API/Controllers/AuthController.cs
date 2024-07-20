@@ -1,6 +1,7 @@
 namespace SmartCity.API.Controllers;
 
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common.Exceptions;
 using UserManagement.Application.Commands.AuthenticateUser;
@@ -126,15 +127,22 @@ public class AuthController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] LogoutUserCommand command)
     {
         try{
             await _mediator.Send(command);
             return Ok();
-        }catch (ValidationException ex)
+        }
+        catch (ValidationException ex)
         {
             return BadRequest(ex.Errors);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Logout");
+            return StatusCode(500, "An unexpected error occurred. Please check server logs.");
         }
     }
 }
