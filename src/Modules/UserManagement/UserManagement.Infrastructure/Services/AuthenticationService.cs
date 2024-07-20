@@ -35,7 +35,7 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
     public async Task<AuthenticationResult> AuthenticateAsync(string email, string password)
     {
         var user = await _userRepository.GetByEmailAsync(email);
-        if (user == null || !user.PasswordHash.Verify(password))
+        if (user == null || (user.HasPassword() && !user.PasswordHash.Verify(password)))
         {
             return new AuthenticationResult { Success = false, Errors = ["Invalid credentials"] };
         }

@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common.Exceptions;
+using UserManagement.Application.Commands.AuthenticateUser;
 using UserManagement.Application.Commands.BuildOAuthChallengeUrl;
 using UserManagement.Application.Commands.HandleOAuthCallback;
 using UserManagement.Application.Commands.RegisterUser;
@@ -63,13 +64,13 @@ public class AuthController : ControllerBase
 
             var challengeUrl = await _mediator.Send(command);
             _logger.LogInformation("Redirecting to challenge URL: {ChallengeUrl}", challengeUrl);
-            Response.Headers["Location"] = challengeUrl;
+            Response.Headers.Location = challengeUrl;
             Response.StatusCode = 200;
             return new EmptyResult();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error in ExternalLogin for provider: {Provider}", provider);
+            _logger.LogError(ex, "Error in ExternalLogin for provider: {Provider}:\n{Error}", provider, ex.Message);
             return StatusCode(500, "An unexpected error occurred. Please check server logs.");
         }
     }
@@ -103,5 +104,26 @@ public class AuthController : ControllerBase
             return StatusCode(500, "An unexpected error occurred. Please check server logs.");
         }
 
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] AuthenticateUserCommand command)
+    {
+        try
+        {
+            var result = await _mediator.Send(command);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Errors);
+        }
     }
 }

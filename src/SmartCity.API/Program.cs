@@ -60,6 +60,11 @@ builder.Services.AddSingleton<RedisSlidingWindowLimiter>(sp =>
     return new RedisSlidingWindowLimiter(redis);
 });
 
+builder.Services.AddRouting(options => {
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
+
 
 var app = builder.Build();
 
