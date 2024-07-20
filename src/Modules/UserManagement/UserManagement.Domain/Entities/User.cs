@@ -52,7 +52,7 @@ namespace UserManagement.Domain.Entities
             AddAuthenticationMethod(AuthenticationMethod.EmailPassword);
         }
 
-        public string GetOAuthId(string provider)
+        public string? GetOAuthId(string provider)
         {
             return provider.ToLower() switch
             {

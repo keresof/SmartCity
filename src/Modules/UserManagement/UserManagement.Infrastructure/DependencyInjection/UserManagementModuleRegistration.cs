@@ -34,6 +34,10 @@ public class UserManagementModuleRegistration : IModuleRegistration
         services.AddDbContext<UserManagementDbContext>(
             options => options.UseNpgsql(connectionString)
         )
+        .AddScoped<ITokenBlacklistService, RedisTokenBlacklistService>(s =>
+        {
+            return new RedisTokenBlacklistService(redis);
+        })
         .AddScoped<IUserRepository, UserRepository>()
         .AddScoped<IRoleRepository, RoleRepository>()
         .AddScoped<IPermissionRepository, PermissionRepository>()
@@ -50,9 +54,10 @@ public class UserManagementModuleRegistration : IModuleRegistration
         .AddSingleton<IOAuthProviderFactory, OAuthProviderFactory>(s => {
             return new OAuthProviderFactory(configuration, s.GetRequiredService<IHttpClientFactory>(), redis);
         })
+        
         .AddScoped<IAuthenticationService, AuthenticationService>(s =>
         {
-            return new AuthenticationService(s.GetRequiredService<IUserRepository>(), s.GetRequiredService<ITokenService>(), redis, configuration);
+            return new AuthenticationService(s.GetRequiredService<IUserRepository>(), s.GetRequiredService<ITokenService>(), redis, configuration, s.GetRequiredService<ITokenBlacklistService>());
         })
         .AddScoped<IOAuthProvider, GoogleOAuthProvider>( s=> {
             return new GoogleOAuthProvider(configuration, s.GetRequiredService<IHttpClientFactory>(), redis);

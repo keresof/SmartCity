@@ -7,7 +7,9 @@ using Shared.Common.Interfaces;
 using Shared.Common;
 using MediatR;
 using Shared.Common.Behaviors;
-using System.Reflection;
+using SmartCity.API.Middleware;
+using UserManagement.Application.Interfaces;
+using UserManagement.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,6 +111,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseBlacklistedTokenMiddleware();
 
 app.UseAuthentication();
 

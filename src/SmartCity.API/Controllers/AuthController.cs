@@ -1,13 +1,12 @@
 namespace SmartCity.API.Controllers;
 
-using System.Text.Json;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common.Exceptions;
 using UserManagement.Application.Commands.AuthenticateUser;
 using UserManagement.Application.Commands.BuildOAuthChallengeUrl;
 using UserManagement.Application.Commands.HandleOAuthCallback;
+using UserManagement.Application.Commands.LogoutUser;
 using UserManagement.Application.Commands.RegisterUser;
 
 [ApiController]
@@ -122,6 +121,18 @@ public class AuthController : ControllerBase
             }
         }
         catch (ValidationException ex)
+        {
+            return BadRequest(ex.Errors);
+        }
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] LogoutUserCommand command)
+    {
+        try{
+            await _mediator.Send(command);
+            return Ok();
+        }catch (ValidationException ex)
         {
             return BadRequest(ex.Errors);
         }

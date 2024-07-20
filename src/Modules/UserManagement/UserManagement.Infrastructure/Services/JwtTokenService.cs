@@ -89,13 +89,13 @@ public class JwtTokenService : ITokenService
         return Convert.ToBase64String(randomNumber);
     }
 
-    public async Task<ClaimsPrincipal> ValidateToken(string token)
+    public async Task<ClaimsPrincipal> ValidateToken(string token, bool validateLifetime = true)
     {
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateLifetime = validateLifetime,
             ValidateIssuerSigningKey = true,
             ValidIssuer = _configuration["JwtIssuer"],
             ValidAudience = _configuration["JwtAudience"],

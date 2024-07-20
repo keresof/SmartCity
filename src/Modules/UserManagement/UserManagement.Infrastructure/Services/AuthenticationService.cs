@@ -3,13 +3,6 @@ using StackExchange.Redis;
 using UserManagement.Application.DTOs;
 using UserManagement.Application.Interfaces;
 using Microsoft.IdentityModel.JsonWebTokens;
-
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
-using Microsoft.AspNetCore.Authentication.Facebook;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 using UserManagement.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using UserManagement.Domain.Enums;
@@ -22,14 +15,15 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
     private readonly ITokenService _tokenService;
     private readonly IConnectionMultiplexer _redis;
     private readonly IConfiguration _configuration;
-    private const string BlacklistPrefix = "blacklisted_token:";
+    private readonly ITokenBlacklistService _tokenBlacklistService;
 
-    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis,IConfiguration configuration)
+    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis,IConfiguration configuration, ITokenBlacklistService tokenBlacklistService)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
         _redis = redis;
         _configuration = configuration;
+        _tokenBlacklistService = tokenBlacklistService;
     }
 
     public async Task<AuthenticationResult> AuthenticateAsync(string email, string password)
@@ -126,19 +120,19 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
         await _userRepository.UpdateAsync(user);
 
         // Blacklist the token
-        await BlacklistTokenAsync(token);
+        await _tokenBlacklistService.BlacklistTokenAsync(token);
     }
 
     public async Task<AuthenticationResult> RefreshTokenAsync(string accessToken, string refreshToken)
     {
-        var principal = await _tokenService.ValidateToken(accessToken);
+        var principal = await _tokenService.ValidateToken(accessToken, false);
         if (principal == null)
         {
             return new AuthenticationResult { Success = false, Errors = ["Invalid access token"] };
         }
 
         // Check if the token is blacklisted
-        if (await IsTokenBlacklistedAsync(accessToken))
+        if (await _tokenBlacklistService.IsTokenBlacklistedAsync(accessToken))
         {
             return new AuthenticationResult { Success = false, Errors = ["Token is blacklisted"] };
         }
@@ -163,22 +157,6 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
             Token = newAccessToken,
             RefreshToken = newRefreshToken
         };
-    }
-
-    private async Task BlacklistTokenAsync(string token)
-    {
-        var jsonWebToken = new JsonWebToken(token);
-        var expiry = jsonWebToken.ValidTo;
-        var expiryTimeSpan = expiry - DateTime.UtcNow;
-
-        var db = _redis.GetDatabase();
-        await db.StringSetAsync($"{BlacklistPrefix}{token}", "blacklisted", expiryTimeSpan);
-    }
-
-    private async Task<bool> IsTokenBlacklistedAsync(string token)
-    {
-        var db = _redis.GetDatabase();
-        return await db.KeyExistsAsync($"{BlacklistPrefix}{token}");
     }
 
 }

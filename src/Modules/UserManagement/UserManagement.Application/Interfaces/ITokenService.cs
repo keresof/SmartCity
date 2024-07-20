@@ -7,5 +7,5 @@ public interface ITokenService
 {
     string CreateAccessToken(User user);
     string CreateRefreshToken();
-    Task<ClaimsPrincipal> ValidateToken(string token);
+    Task<ClaimsPrincipal> ValidateToken(string token, bool validateLifetime = true);
 }
