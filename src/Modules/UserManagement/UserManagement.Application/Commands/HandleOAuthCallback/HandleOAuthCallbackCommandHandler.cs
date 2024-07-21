@@ -9,13 +9,10 @@ namespace UserManagement.Application.Commands.HandleOAuthCallback;
 public class HandleOAuthCallbackCommandHandler : IRequestHandler<HandleOAuthCallbackCommand, AuthenticationResult>
 {
     private readonly IOAuthService _oauthService;
-    private readonly IAuthenticationService _authenticationService;
-    private readonly IOAuthProviderFactory _providerFactory;
 
-    public HandleOAuthCallbackCommandHandler(IOAuthProviderFactory providerFactory, IAuthenticationService authenticationService, IOAuthService oAuthService)
+
+    public HandleOAuthCallbackCommandHandler(IOAuthService oAuthService)
     {
-        _providerFactory = providerFactory;
-        _authenticationService = authenticationService;
         _oauthService = oAuthService;
     }
 

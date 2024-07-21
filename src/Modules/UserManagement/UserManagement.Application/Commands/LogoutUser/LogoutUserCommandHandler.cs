@@ -9,7 +9,7 @@ public class LogoutUserCommandHandler(IAuthenticationService authenticationServi
 
     public async Task<Unit> Handle(LogoutUserCommand request, CancellationToken cancellationToken)
     {
-        await _authenticationService.LogoutAsync(request.AccessToken);
+        await _authenticationService.LogoutAsync(request.AccessToken, request.RefreshToken);
         return Unit.Value;
     }
 }

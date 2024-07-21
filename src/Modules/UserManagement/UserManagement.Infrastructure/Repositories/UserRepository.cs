@@ -54,5 +54,10 @@ namespace UserManagement.Infrastructure.Repositories
                     return Task.FromResult<User?>(null);
             }
         }
+
+        public Task<User?> GetByRefreshTokenAsync(string refreshToken)
+        {
+            return _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
     }
 }

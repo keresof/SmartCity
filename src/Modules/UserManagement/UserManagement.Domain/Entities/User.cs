@@ -34,7 +34,8 @@ namespace UserManagement.Domain.Entities
                 LastName = lastName,
                 Email = email,
                 IsActive = true,
-                IsDeleted = false
+                IsDeleted = false,
+                Created = DateTime.UtcNow,
             };
         }
 

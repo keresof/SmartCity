@@ -34,6 +34,9 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
         user.AddAuthenticationMethod(AuthenticationMethod.EmailPassword);
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
+        user.CreatedBy = user.Id.ToString();
+        await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
 
         var token = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();

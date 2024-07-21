@@ -8,6 +8,7 @@ using UserManagement.Application.Commands.AuthenticateUser;
 using UserManagement.Application.Commands.BuildOAuthChallengeUrl;
 using UserManagement.Application.Commands.HandleOAuthCallback;
 using UserManagement.Application.Commands.LogoutUser;
+using UserManagement.Application.Commands.RefreshUserToken;
 using UserManagement.Application.Commands.RegisterUser;
 
 [ApiController]
@@ -143,6 +144,28 @@ public class AuthController : ControllerBase
         {
             _logger.LogError(ex, "Error in Logout");
             return StatusCode(500, "An unexpected error occurred. Please check server logs.");
+        }
+    }
+
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshUserTokenCommand command)
+    {
+        try
+        {
+            var result = await _mediator.Send(command);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Errors);
         }
     }
 }
