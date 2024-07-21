@@ -2,28 +2,30 @@ using IdentityModel;
 using StackExchange.Redis;
 using UserManagement.Application.DTOs;
 using UserManagement.Application.Interfaces;
-using Microsoft.IdentityModel.JsonWebTokens;
 using UserManagement.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using UserManagement.Domain.Enums;
+using Shared.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Services;
 
-public class AuthenticationService : Application.Interfaces.IAuthenticationService
+public class AuthenticationService : IAuthenticationService
 {
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
     private readonly IConnectionMultiplexer _redis;
     private readonly IConfiguration _configuration;
     private readonly ITokenBlacklistService _tokenBlacklistService;
+    private readonly IEncryptionService _encryptionService;
 
-    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis,IConfiguration configuration, ITokenBlacklistService tokenBlacklistService)
+    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis,IConfiguration configuration, ITokenBlacklistService tokenBlacklistService, IEncryptionService encryptionService)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
         _redis = redis;
         _configuration = configuration;
         _tokenBlacklistService = tokenBlacklistService;
+        _encryptionService = encryptionService;
     }
 
     public async Task<AuthenticationResult> AuthenticateAsync(string email, string password)
@@ -41,8 +43,9 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
         var accessToken = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<int>("RefreshTokenExpiry")));
+        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<int>("RefreshTokenExpiry")), _encryptionService);
         await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
 
         return new AuthenticationResult
         {
@@ -64,7 +67,7 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
 
         if (user == null)
         {
-            user = User.Create(firstName ?? name, lastName, email);
+            user = User.Create(firstName ?? name, lastName, email, _encryptionService);
             user.SetOAuthId(provider, externalId);
             await _userRepository.AddAsync(user);
         }
@@ -82,15 +85,15 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
                 return new AuthenticationResult { Success = false, Errors = new[] { "Email is already registered with a different external account from the same provider." } };
             }
             // Update the user's name and last name if not present
-            user.SetFirstName(firstName ?? user.FirstName);
-            user.SetLastName(lastName ?? user.LastName);
+            user.SetFirstName(firstName ?? user.FirstName.Decrypt(_encryptionService), _encryptionService);
+            user.SetLastName(lastName ?? user.LastName.Decrypt(_encryptionService), _encryptionService);
             await _userRepository.UpdateAsync(user);
         }
 
         var accessToken = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(_configuration["RefreshTokenExpiry"])));
+        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(_configuration["RefreshTokenExpiry"])), _encryptionService);
         await _userRepository.SaveChangesAsync();
         return new AuthenticationResult
         {
@@ -100,47 +103,37 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
         };
     }
 
-    public async Task LogoutAsync(string token)
+    public async Task LogoutAsync(string accessToken, string refreshToken)
     {
-        var principal = await _tokenService.ValidateToken(token);
-        if (principal == null)
+        var principal = await _tokenService.ValidateToken(accessToken);
+        var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+        if (user == null || principal == null)
         {
-            throw new InvalidOperationException("Invalid token");
+            throw new InvalidOperationException("Invalid credentials.");
         }
 
-        var userId = Guid.Parse(principal.FindFirst(JwtClaimTypes.Subject)?.Value);
-        var user = await _userRepository.GetByIdAsync(userId.ToString());
-        if (user == null)
+        var id = principal.FindFirst(JwtClaimTypes.Subject)?.Value;
+        if (id != user.Id.ToString())
         {
-            throw new InvalidOperationException("User not found");
+            throw new InvalidOperationException("Invalid credentials.");
         }
+
+        // Add the refresh token to the blacklist
+        await _tokenBlacklistService.BlacklistTokenAsync(accessToken);
 
         // Set the user's refreshToken to null
-        user.SetRefreshToken(null, DateTime.MinValue);
-        await _userRepository.UpdateAsync(user);
+        user.SetRefreshToken(null, DateTime.MinValue, _encryptionService);
 
-        // Blacklist the token
-        await _tokenBlacklistService.BlacklistTokenAsync(token);
+        await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
     }
 
-    public async Task<AuthenticationResult> RefreshTokenAsync(string accessToken, string refreshToken)
+    public async Task<AuthenticationResult> RefreshTokenAsync(string refreshToken)
     {
-        var principal = await _tokenService.ValidateToken(accessToken, false);
-        if (principal == null)
-        {
-            return new AuthenticationResult { Success = false, Errors = ["Invalid access token"] };
-        }
 
-        // Check if the token is blacklisted
-        if (await _tokenBlacklistService.IsTokenBlacklistedAsync(accessToken))
-        {
-            return new AuthenticationResult { Success = false, Errors = ["Token is blacklisted"] };
-        }
+        var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
 
-        var userId = Guid.Parse(principal.FindFirst(JwtClaimTypes.Subject)?.Value);
-
-        var user = await _userRepository.GetByIdAsync(userId.ToString());
-        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (user == null || user.RefreshToken.Decrypt(_encryptionService) != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
             return new AuthenticationResult { Success = false, Errors = ["Invalid refresh token"] };
         }
@@ -148,8 +141,9 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
         var newAccessToken = _tokenService.CreateAccessToken(user);
         var newRefreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<int>("RefreshTokenExpiry")));
+        user.SetRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<double>("RefreshTokenExpiry")), _encryptionService);
         await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
 
         return new AuthenticationResult
         {
@@ -157,6 +151,13 @@ public class AuthenticationService : Application.Interfaces.IAuthenticationServi
             Token = newAccessToken,
             RefreshToken = newRefreshToken
         };
+    }
+
+
+    public async Task<bool> HasValidRefreshToken(string userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        return user != null && user.RefreshToken != null && user.RefreshTokenExpiryTime > DateTime.UtcNow;
     }
 
 }

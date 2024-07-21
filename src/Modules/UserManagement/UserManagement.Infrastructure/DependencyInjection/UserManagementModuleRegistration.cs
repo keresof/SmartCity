@@ -31,7 +31,10 @@ public class UserManagementModuleRegistration : IModuleRegistration
         var connectionString = ConnectionStringParser.ConvertToNpgsqlFormat(configuration["DefaultConnection"]!);
         var redis = RedisConnectionHelper.Connection;
 
-        services.AddDbContext<UserManagementDbContext>(
+        services.AddSingleton<IEncryptionService, AesEncryptionService>(opts => {
+            return new AesEncryptionService(configuration["EncryptionKey"]);
+        })
+        .AddDbContext<UserManagementDbContext>(
             options => options.UseNpgsql(connectionString)
         )
         .AddScoped<ITokenBlacklistService, RedisTokenBlacklistService>(s =>
@@ -43,7 +46,7 @@ public class UserManagementModuleRegistration : IModuleRegistration
         .AddScoped<IPermissionRepository, PermissionRepository>()
         .AddScoped<ITokenService, JwtTokenService>(s =>
         {
-            return new JwtTokenService(configuration, s.GetRequiredService<ILogger<JwtTokenService>>());
+            return new JwtTokenService(configuration, s.GetRequiredService<ILogger<JwtTokenService>>(), s.GetRequiredService<IEncryptionService>());
         })
         .AddScoped<IOTPService, RedisOTPService>(s =>
         {
@@ -57,7 +60,7 @@ public class UserManagementModuleRegistration : IModuleRegistration
         
         .AddScoped<IAuthenticationService, AuthenticationService>(s =>
         {
-            return new AuthenticationService(s.GetRequiredService<IUserRepository>(), s.GetRequiredService<ITokenService>(), redis, configuration, s.GetRequiredService<ITokenBlacklistService>());
+            return new AuthenticationService(s.GetRequiredService<IUserRepository>(), s.GetRequiredService<ITokenService>(), redis, configuration, s.GetRequiredService<ITokenBlacklistService>(), s.GetRequiredService<IEncryptionService>());
         })
         .AddScoped<IOAuthProvider, GoogleOAuthProvider>( s=> {
             return new GoogleOAuthProvider(configuration, s.GetRequiredService<IHttpClientFactory>(), redis);

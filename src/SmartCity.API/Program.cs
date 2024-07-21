@@ -118,6 +118,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseRefreshTokenValidationMiddleware();
+
 app.MapControllers();
 
 app.Run();
