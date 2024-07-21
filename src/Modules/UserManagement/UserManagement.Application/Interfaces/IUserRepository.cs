@@ -9,6 +9,7 @@ namespace UserManagement.Application.Interfaces
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByExternalProviderIdAsync(string provider, string id);
         Task<User?> GetByRefreshTokenAsync(string refreshToken);
+        // Task<bool> IsEmailUnique(string email);
         Task AddAsync(User user);
         Task UpdateAsync(User user);
         Task SaveChangesAsync();

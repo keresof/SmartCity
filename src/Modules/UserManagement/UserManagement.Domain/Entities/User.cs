@@ -1,4 +1,6 @@
 using Shared.Common.Abstract;
+using Shared.Common.Interfaces;
+using Shared.Common.ValueObjects;
 using UserManagement.Domain.Enums;
 using UserManagement.Domain.ValueObjects;
 namespace UserManagement.Domain.Entities
@@ -6,17 +8,23 @@ namespace UserManagement.Domain.Entities
     public class User : AuditableEntity
     {
         public List<UserRole> Roles { get; private set; } = new List<UserRole>();
-        public string FirstName { get; private set; }
-        public string LastName { get; private set; }
-        public string Email { get; private set; }
+        public EncryptedField FirstName { get; private set; }
+        public string FirstNameHash { get; private set; }
+        public EncryptedField LastName { get; private set; }
+        public string LastNameHash { get; private set; }
+        public EncryptedField Email { get; private set; }
+        public string EmailHash { get; private set; }
         public string? GoogleId { get; private set; }
         public string? MicrosoftId { get; private set; }
         public string? FacebookId { get; private set; }
-        public string? PhoneNumber { get; private set; }
+        public EncryptedField? PhoneNumber { get; private set; }
+        public string? PhoneNumberHash { get; private set; }
         public Password? PasswordHash { get; private set; }
-        public string? RefreshToken { get; private set; }
+        public EncryptedField? RefreshToken { get; private set; }
+        public string? RefreshTokenHash { get; private set; }
         public DateTime? RefreshTokenExpiryTime { get; private set; }
-        public string? ResetPasswordToken { get; private set; }
+        public EncryptedField? ResetPasswordToken { get; private set; }
+        public string? ResetPasswordTokenHash { get; private set; }
         public DateTime? ResetPasswordTokenExpiryTime { get; private set; }
         public bool IsEmailVerified { get; private set; }
         public bool IsPhoneNumberVerified { get; private set; }
@@ -24,19 +32,17 @@ namespace UserManagement.Domain.Entities
         public bool IsDeleted { get; private set; }
         public List<AuthenticationMethod> AuthenticationMethods { get; private set; } = new List<AuthenticationMethod>();
 
-        private User() { } // For EF Core
-
-        public static User Create(string firstName, string lastName, string email)
+        public static User Create(string firstName, string lastName, string email, IEncryptionService encryptionService)
         {
-            return new User
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Email = email,
+            var user = new User{
                 IsActive = true,
                 IsDeleted = false,
                 Created = DateTime.UtcNow,
             };
+            user.SetFirstName(firstName, encryptionService);
+            user.SetLastName(lastName, encryptionService);
+            user.SetEmail(email, encryptionService);
+            return user;
         }
 
         public void AddAuthenticationMethod(AuthenticationMethod method)
@@ -106,15 +112,22 @@ namespace UserManagement.Domain.Entities
             IsEmailVerified = true;
         }
 
-        public void SetRefreshToken(string? token, DateTime expiryTime)
+        public void SetRefreshToken(string? token, DateTime expiryTime, IEncryptionService encryptionService)
         {
-            RefreshToken = token;
             RefreshTokenExpiryTime = expiryTime;
+            if(token == null)
+            {
+                RefreshToken = null;
+                RefreshTokenHash = null;
+                return;
+            }
+            RefreshToken = EncryptedField.Create(token, encryptionService);
+            RefreshTokenHash = RefreshToken.HashedValue;
         }
 
-        public void SetResetPasswordToken(string token, DateTime expiryTime)
+        public void SetResetPasswordToken(string token, DateTime expiryTime, IEncryptionService encryptionService)
         {
-            ResetPasswordToken = token;
+            ResetPasswordToken = EncryptedField.Create(token, encryptionService);
             ResetPasswordTokenExpiryTime = expiryTime;
         }
 
@@ -140,19 +153,32 @@ namespace UserManagement.Domain.Entities
                 Roles.Remove(userRole);
             }
         }
-        public void SetFirstName(string firstName)
+        public void SetFirstName(string firstName, IEncryptionService encryptionService)
         {
-            FirstName = firstName;
+            var encryptedFirstName = EncryptedField.Create(firstName, encryptionService);
+            FirstNameHash = encryptedFirstName.HashedValue;
+            FirstName = encryptedFirstName;
         }
 
-        public void SetLastName(string lastName)
+        public void SetLastName(string lastName, IEncryptionService encryptionService)
         {
-            LastName = lastName;
+            var encryptedLastName = EncryptedField.Create(lastName, encryptionService);
+            LastNameHash = encryptedLastName.HashedValue;
+            LastName = encryptedLastName;
         }
 
-        public void SetPhoneNumber(string phoneNumber)
+        public void SetPhoneNumber(string phoneNumber, IEncryptionService encryptionService)
         {
-            PhoneNumber = phoneNumber;
+            var encryptedPhoneNumber = EncryptedField.Create(phoneNumber, encryptionService);
+            PhoneNumberHash = encryptedPhoneNumber.HashedValue;
+            PhoneNumber = encryptedPhoneNumber;
+        }
+
+        public void SetEmail(string email, IEncryptionService encryptionService)
+        {
+            var encryptedEmail = EncryptedField.Create(email, encryptionService);
+            EmailHash = encryptedEmail.HashedValue;
+            Email = encryptedEmail;
         }
 
         public void VerifyPhoneNumber()

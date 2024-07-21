@@ -117,9 +117,9 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AuthenticationMethods")
+                    b.Property<int[]>("AuthenticationMethods")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("integer[]");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -127,16 +127,18 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("EmailHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("EmailHash");
 
                     b.Property<string>("FacebookId")
                         .HasColumnType("text");
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("FirstNameHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("FirstNameHash");
 
                     b.Property<string>("GoogleId")
                         .HasColumnType("text");
@@ -159,32 +161,38 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("LastName")
+                    b.Property<string>("LastNameHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("LastNameHash");
 
                     b.Property<string>("MicrosoftId")
                         .HasColumnType("text");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("text");
+                    b.Property<string>("PhoneNumberHash")
+                        .HasColumnType("text")
+                        .HasColumnName("PhoneNumberHash");
 
                     b.Property<DateTime?>("RefreshTokenExpiryTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ResetPasswordToken")
-                        .HasColumnType("text");
+                    b.Property<string>("RefreshTokenHash")
+                        .HasColumnType("text")
+                        .HasColumnName("RefreshTokenHash");
 
                     b.Property<DateTime?>("ResetPasswordTokenExpiryTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ResetPasswordTokenHash")
+                        .HasColumnType("text")
+                        .HasColumnName("ResetPasswordTokenHash");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
+                    b.HasIndex("EmailHash")
                         .IsUnique();
+
+                    b.HasIndex("RefreshTokenHash");
 
                     b.ToTable("Users");
                 });
@@ -231,12 +239,145 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("UserManagement.Domain.Entities.User", b =>
                 {
+                    b.OwnsOne("Shared.Common.ValueObjects.EncryptedField", "Email", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("EncryptedValue")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("Email");
+
+                            b1.Property<string>("HashedValue")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("Shared.Common.ValueObjects.EncryptedField", "FirstName", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("EncryptedValue")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("FirstName");
+
+                            b1.Property<string>("HashedValue")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("Shared.Common.ValueObjects.EncryptedField", "LastName", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("EncryptedValue")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("LastName");
+
+                            b1.Property<string>("HashedValue")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("Shared.Common.ValueObjects.EncryptedField", "PhoneNumber", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("EncryptedValue")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("PhoneNumber");
+
+                            b1.Property<string>("HashedValue")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("Shared.Common.ValueObjects.EncryptedField", "RefreshToken", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("EncryptedValue")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("RefreshToken");
+
+                            b1.Property<string>("HashedValue")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("Shared.Common.ValueObjects.EncryptedField", "ResetPasswordToken", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("EncryptedValue")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("ResetPasswordToken");
+
+                            b1.Property<string>("HashedValue")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
                     b.OwnsOne("UserManagement.Domain.ValueObjects.Password", "PasswordHash", b1 =>
                         {
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("uuid");
 
                             b1.Property<string>("Hash")
+                                .IsRequired()
                                 .HasColumnType("text")
                                 .HasColumnName("PasswordHash");
 
@@ -248,7 +389,22 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                                 .HasForeignKey("UserId");
                         });
 
+                    b.Navigation("Email")
+                        .IsRequired();
+
+                    b.Navigation("FirstName")
+                        .IsRequired();
+
+                    b.Navigation("LastName")
+                        .IsRequired();
+
                     b.Navigation("PasswordHash");
+
+                    b.Navigation("PhoneNumber");
+
+                    b.Navigation("RefreshToken");
+
+                    b.Navigation("ResetPasswordToken");
                 });
 
             modelBuilder.Entity("UserManagement.Domain.Entities.UserRole", b =>

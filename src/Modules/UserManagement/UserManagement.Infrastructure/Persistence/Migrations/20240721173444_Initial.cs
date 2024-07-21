@@ -51,22 +51,34 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
+                    FirstName_HashedValue = table.Column<string>(type: "text", nullable: false),
+                    FirstNameHash = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
+                    LastName_HashedValue = table.Column<string>(type: "text", nullable: false),
+                    LastNameHash = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
+                    Email_HashedValue = table.Column<string>(type: "text", nullable: false),
+                    EmailHash = table.Column<string>(type: "text", nullable: false),
                     GoogleId = table.Column<string>(type: "text", nullable: true),
                     MicrosoftId = table.Column<string>(type: "text", nullable: true),
                     FacebookId = table.Column<string>(type: "text", nullable: true),
                     PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber_HashedValue = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberHash = table.Column<string>(type: "text", nullable: true),
                     PasswordHash = table.Column<string>(type: "text", nullable: true),
                     RefreshToken = table.Column<string>(type: "text", nullable: true),
+                    RefreshToken_HashedValue = table.Column<string>(type: "text", nullable: true),
+                    RefreshTokenHash = table.Column<string>(type: "text", nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ResetPasswordToken = table.Column<string>(type: "text", nullable: true),
+                    ResetPasswordToken_HashedValue = table.Column<string>(type: "text", nullable: true),
+                    ResetPasswordTokenHash = table.Column<string>(type: "text", nullable: true),
                     ResetPasswordTokenExpiryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsEmailVerified = table.Column<bool>(type: "boolean", nullable: false),
                     IsPhoneNumberVerified = table.Column<bool>(type: "boolean", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    AuthenticationMethods = table.Column<string>(type: "text", nullable: false),
+                    AuthenticationMethods = table.Column<int[]>(type: "integer[]", nullable: false),
                     Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -160,10 +172,15 @@ namespace UserManagement.Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
+                name: "IX_Users_EmailHash",
                 table: "Users",
-                column: "Email",
+                column: "EmailHash",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RefreshTokenHash",
+                table: "Users",
+                column: "RefreshTokenHash");
         }
 
         /// <inheritdoc />

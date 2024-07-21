@@ -140,6 +140,10 @@ public class AuthController : ControllerBase
         {
             return BadRequest(ex.Errors);
         }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error in Logout");

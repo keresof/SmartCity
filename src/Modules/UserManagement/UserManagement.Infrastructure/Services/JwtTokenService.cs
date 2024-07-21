@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Common.Interfaces;
 using UserManagement.Application.Interfaces;
 using UserManagement.Domain.Entities;
 
@@ -16,12 +17,14 @@ public class JwtTokenService : ITokenService
     private readonly RsaSecurityKey _publicKey;
     private readonly JsonWebTokenHandler _tokenHandler;
     private readonly ILogger<JwtTokenService> _logger;
+    private readonly IEncryptionService _encryptionService;
     public RsaSecurityKey RsaSecurityKey => _publicKey;
 
-    public JwtTokenService(IConfiguration configuration, ILogger<JwtTokenService> logger)
+    public JwtTokenService(IConfiguration configuration, ILogger<JwtTokenService> logger, IEncryptionService encryptionService)
     {
         _configuration = configuration;
         _logger = logger;
+        _encryptionService = encryptionService;
 
         RSA rsa;
         string jwtKeyFilepath = _configuration["JwtPrivateKeyFilepath"] ?? "private_key.pem";
@@ -59,7 +62,7 @@ public class JwtTokenService : ITokenService
         var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new(JwtRegisteredClaimNames.Email, user.Email),
+                new(JwtRegisteredClaimNames.Email, user.Email.Decrypt(_encryptionService)),
                 new("email_verified", user.IsEmailVerified.ToString().ToLower(), ClaimValueTypes.Boolean)
             };
 

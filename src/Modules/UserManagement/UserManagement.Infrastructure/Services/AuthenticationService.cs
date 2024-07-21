@@ -5,6 +5,7 @@ using UserManagement.Application.Interfaces;
 using UserManagement.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using UserManagement.Domain.Enums;
+using Shared.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Services;
 
@@ -15,14 +16,16 @@ public class AuthenticationService : IAuthenticationService
     private readonly IConnectionMultiplexer _redis;
     private readonly IConfiguration _configuration;
     private readonly ITokenBlacklistService _tokenBlacklistService;
+    private readonly IEncryptionService _encryptionService;
 
-    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis,IConfiguration configuration, ITokenBlacklistService tokenBlacklistService)
+    public AuthenticationService(IUserRepository userRepository, ITokenService tokenService, IConnectionMultiplexer redis,IConfiguration configuration, ITokenBlacklistService tokenBlacklistService, IEncryptionService encryptionService)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
         _redis = redis;
         _configuration = configuration;
         _tokenBlacklistService = tokenBlacklistService;
+        _encryptionService = encryptionService;
     }
 
     public async Task<AuthenticationResult> AuthenticateAsync(string email, string password)
@@ -40,7 +43,7 @@ public class AuthenticationService : IAuthenticationService
         var accessToken = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<int>("RefreshTokenExpiry")));
+        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<int>("RefreshTokenExpiry")), _encryptionService);
         await _userRepository.UpdateAsync(user);
         await _userRepository.SaveChangesAsync();
 
@@ -64,7 +67,7 @@ public class AuthenticationService : IAuthenticationService
 
         if (user == null)
         {
-            user = User.Create(firstName ?? name, lastName, email);
+            user = User.Create(firstName ?? name, lastName, email, _encryptionService);
             user.SetOAuthId(provider, externalId);
             await _userRepository.AddAsync(user);
         }
@@ -82,15 +85,15 @@ public class AuthenticationService : IAuthenticationService
                 return new AuthenticationResult { Success = false, Errors = new[] { "Email is already registered with a different external account from the same provider." } };
             }
             // Update the user's name and last name if not present
-            user.SetFirstName(firstName ?? user.FirstName);
-            user.SetLastName(lastName ?? user.LastName);
+            user.SetFirstName(firstName ?? user.FirstName.Decrypt(_encryptionService), _encryptionService);
+            user.SetLastName(lastName ?? user.LastName.Decrypt(_encryptionService), _encryptionService);
             await _userRepository.UpdateAsync(user);
         }
 
         var accessToken = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(_configuration["RefreshTokenExpiry"])));
+        user.SetRefreshToken(refreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(_configuration["RefreshTokenExpiry"])), _encryptionService);
         await _userRepository.SaveChangesAsync();
         return new AuthenticationResult
         {
@@ -119,7 +122,7 @@ public class AuthenticationService : IAuthenticationService
         await _tokenBlacklistService.BlacklistTokenAsync(accessToken);
 
         // Set the user's refreshToken to null
-        user.SetRefreshToken(null, DateTime.MinValue);
+        user.SetRefreshToken(null, DateTime.MinValue, _encryptionService);
 
         await _userRepository.UpdateAsync(user);
         await _userRepository.SaveChangesAsync();
@@ -130,7 +133,7 @@ public class AuthenticationService : IAuthenticationService
 
         var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
 
-        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (user == null || user.RefreshToken.Decrypt(_encryptionService) != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
             return new AuthenticationResult { Success = false, Errors = ["Invalid refresh token"] };
         }
@@ -138,7 +141,7 @@ public class AuthenticationService : IAuthenticationService
         var newAccessToken = _tokenService.CreateAccessToken(user);
         var newRefreshToken = _tokenService.CreateRefreshToken();
 
-        user.SetRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<double>("RefreshTokenExpiry")));
+        user.SetRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(_configuration.GetValue<double>("RefreshTokenExpiry")), _encryptionService);
         await _userRepository.UpdateAsync(user);
         await _userRepository.SaveChangesAsync();
 
