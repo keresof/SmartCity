@@ -59,11 +59,11 @@ public class AuthController : ControllerBase
             }
 
             //var redirectUri = Url.Action(nameof(ExternalLoginCallback), "Auth", new { provider }, Request.Scheme);
-            var redirectUri = new Uri(_configuration["GoogleAuthRedirectUri"] ?? Url.Action(nameof(ExternalLoginCallback), "Auth", new { provider }, Request.Scheme));
+            var redirectUri = _configuration["GoogleAuthRedirectUri"] ?? Url.Action(nameof(ExternalLoginCallback), "Auth", new { provider }, Request.Scheme);
             var command = new BuildOAuthChallengeUrlCommand
             {
                 ProviderName = provider,
-                RedirectUri = redirectUri.ToString()
+                RedirectUri = redirectUri
             };
 
             var challengeUrl = await _mediator.Send(command);
