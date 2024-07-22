@@ -21,6 +21,7 @@ public class ReportManagementModuleRegistration : IModuleRegistration
                 options => options.UseNpgsql(connectionString)
             )
             .AddScoped<IReportRepository, ReportRepository>()
+            .AddScoped<IReportMediaRepository, ReportMediaRepository>()
             .AddScoped<IFileUploadService, FileUploadService>() // Add this line
             .AddMediatR(cfg =>
             {

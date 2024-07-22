@@ -14,7 +14,7 @@ namespace ReportManagement.Application.Queries
 
         public async Task<(byte[] FileContents, string ContentType)?> Handle(GetFileQuery request, CancellationToken cancellationToken)
         {
-            return await _fileUploadService.GetFileAsync(request.FileName, cancellationToken);
+            return await _fileUploadService.GetFileAsync(request.FileId, request.UserId, cancellationToken);
         }
     }
 }

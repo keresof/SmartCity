@@ -1,3 +1,4 @@
+using ReportManagement.Domain.Entities;
 using ReportManagement.Domain.Enums;
 
 namespace ReportManagement.Application.DTOs;
@@ -9,7 +10,7 @@ public record ReportDto(
     string[] Location,
     ReportStatus Status,
     DateTime Created,
-    string[] MediaUrls,
+    IEnumerable<ReportMedia> Medias,
     Guid UserId,
     DateTime? LastModified,
     string LastModifiedBy,

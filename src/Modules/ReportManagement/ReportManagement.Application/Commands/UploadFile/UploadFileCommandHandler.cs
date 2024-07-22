@@ -16,7 +16,7 @@ namespace ReportManagement.Application.Commands.UploadFile
 
         public async Task<string> Handle(UploadFileCommand request, CancellationToken cancellationToken)
         {
-            return await _fileUploadService.UploadFileAsync(request.FileContent, request.FileName, request.ContentType, cancellationToken);
+            return await _fileUploadService.UploadFileAsync(request.ReportId, request.UserId, request.FileContent, request.FileName, request.ContentType, cancellationToken);
         }
     }
 }

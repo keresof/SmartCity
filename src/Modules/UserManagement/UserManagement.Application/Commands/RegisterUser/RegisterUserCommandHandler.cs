@@ -42,6 +42,8 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
 
         var token = _tokenService.CreateAccessToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
+        await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
 
         return new RegisterUserResult
         {

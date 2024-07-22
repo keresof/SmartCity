@@ -10,11 +10,13 @@ using ReportManagement.Application.Queries.GetReportsByUserId;
 using ReportManagement.Application.Queries.SearchReports;
 using ReportManagement.Application.Commands.UploadFile;
 using Shared.Common.Exceptions;
+using Shared.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
 using ReportManagement.Application.Queries;
+using System.Security.Claims;
 
 namespace SmartCity.API.Controllers
 {
@@ -24,10 +26,12 @@ namespace SmartCity.API.Controllers
     public class ReportsController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<ReportsController> _logger;
 
-        public ReportsController(IMediator mediator)
+        public ReportsController(IMediator mediator, ILogger<ReportsController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -102,37 +106,101 @@ namespace SmartCity.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("upload")]
-        public async Task<ActionResult<string>> UploadFile(IFormFile file)
+        [HttpPost("{reportId}/upload")]
+        public async Task<ActionResult<string>> UploadFile([FromRoute] string reportId, [FromForm] IFormFile file)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("File is empty");
-
-            using var memoryStream = new MemoryStream();
-            await file.CopyToAsync(memoryStream);
-
-            var command = new UploadFileCommand(
-                memoryStream.ToArray(),
-                file.FileName,
-                file.ContentType);
-
-            var result = await _mediator.Send(command);
-
-            return Ok(new { url = result });
-        }
-
-        [HttpGet("file/{fileName}")]
-        public async Task<IActionResult> GetFile(string fileName)
-        {
-            var query = new GetFileQuery(fileName);
-            var result = await _mediator.Send(query);
-
-            if (result == null)
+            try
             {
-                return NotFound();
+                var userId = User.FindFirstValue("sub");
+                var command = new UploadFileCommand(
+                    reportId,
+                    userId.ToString(),
+                    [..await FileUtils.GetFileBytes(file)],
+                    file.FileName,
+                    file.ContentType
+                );
+                var result = await _mediator.Send(command);
+                return Ok(result);
             }
-
-            return File(result.Value.FileContents, result.Value.ContentType);
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Errors);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in UploadFile, reportId: {reportId}:\n{ex}", reportId, ex.Message);
+                return StatusCode(500, "An unexpected error occurred. Please check server logs.");
+            }
         }
+
+        [HttpGet("file/{mediaId}")]
+        public async Task<IActionResult> GetFile(Guid mediaId)
+        {
+            try
+            {
+                var userId = User.Claims.First(c => c.Type == "sub").Value;
+                var query = new GetFileQuery(mediaId.ToString(), userId);
+                var result = await _mediator.Send(query);
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                return File(result.Value.FileContents, result.Value.ContentType);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetFile, mediaId: {mediaId}:\n{ex}", mediaId, ex.Message);
+                return StatusCode(500, "An unexpected error occurred. Please check server logs.");
+            }
+        }
+
+        // [HttpPost("upload")]
+        // public async Task<ActionResult<string>> UploadFile(IFormFile file)
+        // {
+        //     if (file == null || file.Length == 0)
+        //         return BadRequest("File is empty");
+
+        //     using var memoryStream = new MemoryStream();
+        //     await file.CopyToAsync(memoryStream);
+
+        //     var command = new UploadFileCommand(
+        //         memoryStream.ToArray(),
+        //         file.FileName,
+        //         file.ContentType);
+
+        //     var result = await _mediator.Send(command);
+
+        //     return Ok(new { url = result });
+        // }
+
+        // [HttpGet("file/{fileName}")]
+        // public async Task<IActionResult> GetFile(string fileName)
+        // {
+        //     var query = new GetFileQuery(fileName);
+        //     var result = await _mediator.Send(query);
+
+        //     if (result == null)
+        //     {
+        //         return NotFound();
+        //     }
+
+        //     return File(result.Value.FileContents, result.Value.ContentType);
+        // }
     }
 }

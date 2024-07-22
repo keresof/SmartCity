@@ -12,7 +12,7 @@ using ReportManagement.Infrastructure.Persistence;
 namespace ReportManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ReportManagementDbContext))]
-    [Migration("20240721194312_Initial")]
+    [Migration("20240722191523_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -55,10 +55,6 @@ namespace ReportManagement.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text[]");
 
-                    b.Property<string[]>("MediaUrls")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -72,6 +68,59 @@ namespace ReportManagement.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Reports");
+                });
+
+            modelBuilder.Entity("ReportManagement.Domain.Entities.ReportMedia", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Filename")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Media")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ReportId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportId");
+
+                    b.ToTable("ReportMedias");
+                });
+
+            modelBuilder.Entity("ReportManagement.Domain.Entities.ReportMedia", b =>
+                {
+                    b.HasOne("ReportManagement.Domain.Entities.Report", null)
+                        .WithMany("Medias")
+                        .HasForeignKey("ReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ReportManagement.Domain.Entities.Report", b =>
+                {
+                    b.Navigation("Medias");
                 });
 #pragma warning restore 612, 618
         }
