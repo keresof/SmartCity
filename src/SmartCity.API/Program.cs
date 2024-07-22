@@ -26,6 +26,16 @@ catch (Exception ex)
     Console.WriteLine($"Error loading .env file: {ex.Message}");
 }
 
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
+    options.ListenAnyIP(80);
+    options.ListenAnyIP(443, listenOptions =>
+    {
+        listenOptions.UseHttps();
+    });
+});
+
 builder.Configuration
     .AddEnvironmentVariables()
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
