@@ -34,7 +34,7 @@ public class GoogleOAuthProvider : IOAuthProvider
     {
         var clientId = _configuration["AuthGoogleClientId"];
         var scope = "openid+email+profile";
-        return $"https://accounts.google.com/o/oauth2/v2/auth?client_id={clientId}&response_type=code&scope={scope}&redirect_uri={new IdnMapping().GetAscii(Uri.EscapeDataString(redirectUri).ToString())}&state={state}";
+        return $"https://accounts.google.com/o/oauth2/v2/auth?client_id={clientId}&response_type=code&scope={scope}&redirect_uri={new IdnMapping().GetAscii(_configuration["GoogleRedirectUri"])}&state={state}";
     }
 
     public async Task<OAuthTokenResponse> ExchangeCodeForTokenAsync(string code, string redirectUri)
