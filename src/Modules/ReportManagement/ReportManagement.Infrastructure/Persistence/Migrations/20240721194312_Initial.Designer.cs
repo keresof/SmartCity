@@ -12,7 +12,7 @@ using ReportManagement.Infrastructure.Persistence;
 namespace ReportManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ReportManagementDbContext))]
-    [Migration("20240716232938_Initial")]
+    [Migration("20240721194312_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -39,18 +39,16 @@ namespace ReportManagement.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastModified")
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastModifiedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string[]>("Location")

@@ -5,6 +5,8 @@ using ReportManagement.Application.Commands.CreateReport;
 using ReportManagement.Domain.Repositories;
 using ReportManagement.Infrastructure.Persistence;
 using ReportManagement.Infrastructure.Repositories;
+using ReportManagement.Application.Interfaces;
+using ReportManagement.Infrastructure.Services;
 using Shared.Common.Interfaces;
 using Shared.Common.Utilities;
 
@@ -16,13 +18,13 @@ public class ReportManagementModuleRegistration : IModuleRegistration
     {
         var connectionString = ConnectionStringParser.ConvertToNpgsqlFormat(configuration["DefaultConnection"]!);
         services.AddDbContext<ReportManagementDbContext>(
-            options => options.UseNpgsql(connectionString)
-        )
-        .AddScoped<IReportRepository, ReportRepository>()
-        .AddMediatR(cfg =>
-        {
-            cfg.RegisterServicesFromAssembly(typeof(CreateReportCommand).Assembly);
-        });
-
+                options => options.UseNpgsql(connectionString)
+            )
+            .AddScoped<IReportRepository, ReportRepository>()
+            .AddScoped<IFileUploadService, FileUploadService>() // Add this line
+            .AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(typeof(CreateReportCommand).Assembly);
+            });
     }
 }
