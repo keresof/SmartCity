@@ -10,6 +10,7 @@ using Shared.Common.Behaviors;
 using SmartCity.API.Middleware;
 using UserManagement.Application.Interfaces;
 using UserManagement.Infrastructure.Services;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,18 @@ catch (Exception ex)
 {
     Console.WriteLine($"Error loading .env file: {ex.Message}");
 }
+
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
+    options.ListenAnyIP(80);
+    options.ListenAnyIP(443, listenOptions =>
+    {
+        listenOptions.UseHttps(httpsOpts => {
+            httpsOpts.ServerCertificate = new X509Certificate2(builder.Configuration["CertPath"]?? "cert.pfx");
+        });
+    });
+});
 
 builder.Configuration
     .AddEnvironmentVariables()
