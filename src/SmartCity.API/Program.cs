@@ -32,7 +32,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.ListenAnyIP(443, listenOptions =>
     {
         listenOptions.UseHttps(httpsOpts => {
-            httpsOpts.ServerCertificate = new X509Certificate2(builder.Configuration["CertPath"]?? "cert.pfx");
+            httpsOpts.ServerCertificate = new X509Certificate2(builder.Configuration["CertPath"]?? "cert.pfx", builder.Configuration["CertPassword"] ?? null);
         });
     });
 });
