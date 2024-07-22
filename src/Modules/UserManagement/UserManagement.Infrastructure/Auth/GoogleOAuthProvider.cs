@@ -49,7 +49,7 @@ public class GoogleOAuthProvider : IOAuthProvider
             ["client_secret"] = clientSecret,
             ["code"] = code,
             ["grant_type"] = "authorization_code",
-            ["redirect_uri"] = redirectUri
+            ["redirect_uri"] = new IdnMapping().GetAscii(redirectUri)
         }));
 
         if (!response.IsSuccessStatusCode)
