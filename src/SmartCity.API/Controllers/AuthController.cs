@@ -66,7 +66,7 @@ public class AuthController : ControllerBase
             var challengeUrl = await _mediator.Send(command);
             _logger.LogInformation("Redirecting to challenge URL: {ChallengeUrl}", challengeUrl);
             Response.Headers.Location = challengeUrl;
-            Response.StatusCode = 302;
+            Response.StatusCode = 200;
             return new EmptyResult();
         }
         catch (Exception ex)
