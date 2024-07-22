@@ -18,6 +18,7 @@ try
 {
     var root = Directory.GetCurrentDirectory();
     var dotenv = Path.Combine(root, ".env");
+    Console.WriteLine($"Loading .env file from {Path.GetFullPath(dotenv)}");
     Env.Load(dotenv);
 }
 catch (Exception ex)
