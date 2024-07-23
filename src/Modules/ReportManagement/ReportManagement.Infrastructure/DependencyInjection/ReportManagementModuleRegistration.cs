@@ -21,7 +21,8 @@ public class ReportManagementModuleRegistration : IModuleRegistration
                 options => options.UseNpgsql(connectionString)
             )
             .AddScoped<IReportRepository, ReportRepository>()
-            .AddScoped<IFileUploadService, FileUploadService>() // Add this line
+            .AddScoped<IMediaRepository, MediaRepository>()
+            .AddScoped<IFileService, FileService>()
             .AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(typeof(CreateReportCommand).Assembly);

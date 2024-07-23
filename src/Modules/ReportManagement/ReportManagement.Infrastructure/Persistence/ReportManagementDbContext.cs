@@ -8,6 +8,7 @@ namespace ReportManagement.Infrastructure.Persistence
     public class ReportManagementDbContext : ModuleDbContext
     {
         public DbSet<Report> Reports { get; set; }
+        public DbSet<Media> Media { get; set; }
 
         public ReportManagementDbContext(DbContextOptions<ReportManagementDbContext> options)
             : base(options)
@@ -23,6 +24,15 @@ namespace ReportManagement.Infrastructure.Persistence
             modelBuilder.Entity<Report>()
                 .Property(r => r.Status)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<Media>()
+                .HasIndex(m => m.Url);
+            
+            modelBuilder.Entity<Media>()
+                .HasIndex(m => m.ReportId);
+
+            modelBuilder.Entity<Media>()
+                .HasIndex(m => m.UserId);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

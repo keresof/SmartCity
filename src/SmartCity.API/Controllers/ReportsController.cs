@@ -10,11 +10,10 @@ using ReportManagement.Application.Queries.GetReportsByUserId;
 using ReportManagement.Application.Queries.SearchReports;
 using ReportManagement.Application.Commands.UploadFile;
 using Shared.Common.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.IO;
 using ReportManagement.Application.Queries;
+using SmartCity.API.Infrastructure;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Net.Http.Headers;
 
 namespace SmartCity.API.Controllers
 {
@@ -24,10 +23,12 @@ namespace SmartCity.API.Controllers
     public class ReportsController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<ReportsController> _logger;
 
-        public ReportsController(IMediator mediator)
+        public ReportsController(IMediator mediator, ILogger<ReportsController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -102,37 +103,44 @@ namespace SmartCity.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("upload")]
-        public async Task<ActionResult<string>> UploadFile(IFormFile file)
+        [HttpPost("{reportId}/upload")]
+        [RequestFormLimits(MultipartBodyLengthLimit = 10485760)] // 10 MB
+        [RequestSizeLimit(10485760)] // 10 MB
+        public async Task<ActionResult<string>> UploadFile(Guid reportId)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub")!.Value;
+            if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
+                return BadRequest("Not a multipart request");
+            var form = await Request.ReadFormAsync();
+            var file = form.Files.GetFile("file");
+
             if (file == null || file.Length == 0)
-                return BadRequest("File is empty");
+                return BadRequest("No file was uploaded.");
 
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
-
-            var command = new UploadFileCommand(
-                memoryStream.ToArray(),
-                file.FileName,
-                file.ContentType);
-
-            var result = await _mediator.Send(command);
-
-            return Ok(new { url = result });
+            memoryStream.Position = 0;
+            var command = new UploadFileCommand(reportId.ToString(), userId, file.FileName, memoryStream);
+            var filePath = await _mediator.Send(command);
+            return Ok(filePath);
         }
 
-        [HttpGet("file/{fileName}")]
+        [HttpGet("media/{fileName}")]
         public async Task<IActionResult> GetFile(string fileName)
         {
-            var query = new GetFileQuery(fileName);
-            var result = await _mediator.Send(query);
-
-            if (result == null)
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub")!.Value;
+            try
             {
-                return NotFound();
-            }
+                var query = new GetFileQuery(fileName, userId);
+                var result = await _mediator.Send(query);
 
-            return File(result.Value.FileContents, result.Value.ContentType);
+                return File(result.FileStream, result.ContentType, result.FileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while processing the request.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
     }
 }

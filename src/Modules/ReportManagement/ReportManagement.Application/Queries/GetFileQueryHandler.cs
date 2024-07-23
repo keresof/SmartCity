@@ -1,20 +1,29 @@
 using MediatR;
+using ReportManagement.Application.DTOs;
 using ReportManagement.Application.Interfaces;
+using ReportManagement.Domain.Repositories;
+using Shared.Common.Exceptions;
 
-namespace ReportManagement.Application.Queries
+namespace ReportManagement.Application.Queries;
+
+public class GetFileQueryHandler(IFileService fileService, IMediaRepository mediaRepository) : IRequestHandler<GetFileQuery, FileDownloadDto>
 {
-    public class GetFileQueryHandler : IRequestHandler<GetFileQuery, (byte[] FileContents, string ContentType)?>
+    private readonly IFileService _fileService = fileService;
+    private readonly IMediaRepository _mediaRepository = mediaRepository;
+
+    public async Task<FileDownloadDto> Handle(GetFileQuery request, CancellationToken cancellationToken)
     {
-        private readonly IFileUploadService _fileUploadService;
+        var media = await _mediaRepository.GetByFileNameAsync(request.FileName);
 
-        public GetFileQueryHandler(IFileUploadService fileUploadService)
-        {
-            _fileUploadService = fileUploadService;
-        }
+        if (media == null || !media.UserId.Equals(Guid.Parse(request.UserId))) throw new NotFoundException($"Media not found.");
 
-        public async Task<(byte[] FileContents, string ContentType)?> Handle(GetFileQuery request, CancellationToken cancellationToken)
+        var (FileStream, ContentType, FileName) = await _fileService.GetFileStreamAsync(media.Url);
+
+        return new  FileDownloadDto
         {
-            return await _fileUploadService.GetFileAsync(request.FileName, cancellationToken);
-        }
+            FileStream = FileStream,
+            ContentType = ContentType,
+            FileName = FileName
+        };
     }
 }
