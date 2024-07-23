@@ -22,7 +22,6 @@ public class CreateReportCommandHandler : IRequestHandler<CreateReportCommand, G
             Description = request.Description,
             Location = request.Location,
             Status = (ReportStatus)request.Status,
-            MediaUrls = request.MediaUrls,
             UserId = request.UserId,
             Coordinates = request.Coordinates
         };

@@ -10,9 +10,20 @@ namespace ReportManagement.Domain.Entities
         public string Description { get; set; }
         public string[] Location { get; set; } = [];
         public ReportStatus Status { get; set; }
-        public string[] MediaUrls { get; set; } = [];
+        public IList<string> MediaUrls { get; private set; } = new List<string>();
         public Guid UserId { get; set; }
         
         public decimal[] Coordinates { get; set; } = [];
+
+
+        public void AddMediaUrl(string mediaUrl)
+        {
+            MediaUrls.Add(mediaUrl);
+        }
+
+        public void RemoveMediaUrl(string mediaUrl)
+        {
+            MediaUrls.Remove(mediaUrl);
+        }
     }
 }
