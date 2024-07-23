@@ -39,8 +39,8 @@ namespace UserManagement.Domain.Entities
                 IsDeleted = false,
                 Created = DateTime.UtcNow,
             };
-            user.SetFirstName(firstName, encryptionService);
-            user.SetLastName(lastName, encryptionService);
+            user.SetFirstName(firstName ?? " ", encryptionService);
+            user.SetLastName(lastName ?? " ", encryptionService);
             user.SetEmail(email, encryptionService);
             return user;
         }
