@@ -17,11 +17,13 @@ public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ILogger _logger;
+    private readonly IConfiguration _configuration;
 
-    public AuthController(IMediator mediator, ILogger<AuthController> logger)
+    public AuthController(IMediator mediator, ILogger<AuthController> logger, IConfiguration configuration)
     {
         _mediator = mediator;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [HttpPost("register")]
@@ -56,7 +58,8 @@ public class AuthController : ControllerBase
                 return BadRequest(string.Format("Provider '{0}' is not supported.", provider));
             }
 
-            var redirectUri = Url.Action(nameof(ExternalLoginCallback), "Auth", new { provider }, Request.Scheme);
+            //var redirectUri = Url.Action(nameof(ExternalLoginCallback), "Auth", new { provider }, Request.Scheme);
+            var redirectUri = _configuration["GoogleAuthRedirectUri"] ?? Url.Action(nameof(ExternalLoginCallback), "Auth", new { provider }, Request.Scheme);
             var command = new BuildOAuthChallengeUrlCommand
             {
                 ProviderName = provider,
