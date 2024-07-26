@@ -33,6 +33,8 @@
     <ProjectReference Include="..\Modules\UserManagement\UserManagement.Application\UserManagement.Application.csproj" />
     <ProjectReference Include="..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     <ProjectReference Include="..\Shared\Shared.Common\Shared.Common.csproj" />
+    <ProjectReference Include="..\Modules\NotificationSystem\NotificationSystem.Infrastructure\NotificationSystem.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\NotificationSystem\NotificationSystem.Domain\NotificationSystem.Domain.csproj" />
   </ItemGroup>
 
 </Project>
