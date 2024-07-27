@@ -26,6 +26,19 @@ catch (Exception ex)
     Console.WriteLine($"Error loading .env file: {ex.Message}");
 }
 
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
+    options.ConfigureHttpsDefaults(httpsOptions =>
+    {
+        var cert = X509Certificate2.CreateFromPemFile(
+            builder.Configuration["CertPath"], 
+            builder.Configuration["CertKeyPath"]
+        );
+        httpsOptions.ServerCertificate = cert;
+    });
+});
+
 // builder.WebHost.ConfigureKestrel((context, options) =>
 // {
 //     options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
