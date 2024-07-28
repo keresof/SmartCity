@@ -27,7 +27,11 @@ public class KafkaNotificationSender : INotificationSender, IHostedService, IDis
         _topic = configuration["KafkaNotificationTopic"] ?? "notifications";
         _producerConfig = new ProducerConfig
         {
-            BootstrapServers = configuration["KafkaBootstrapServers"] ?? "localhost:9092"
+            BootstrapServers = configuration["KafkaBootstrapServers"] ?? "localhost:9092",
+            SecurityProtocol = SecurityProtocol.SaslPlaintext,
+            SaslMechanism = SaslMechanism.Plain,
+            SaslUsername = configuration["KafkaUsername"],
+            SaslPassword = configuration["KafkaPassword"]
         };
 
         _retryPolicy = Policy
@@ -47,12 +51,14 @@ public class KafkaNotificationSender : INotificationSender, IHostedService, IDis
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _sendingTask = SendMessagesAsync(_cts.Token);
+        _logger.LogInformation("Starting KafkaNotificationSender");
+        _sendingTask = Task.Run(() => SendMessagesAsync(_cts.Token), cancellationToken);
         return Task.CompletedTask;
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Stopping KafkaNotificationSender");
         _cts.Cancel();
         _messageChannel.Writer.Complete();
         if (_sendingTask != null)
@@ -60,7 +66,47 @@ public class KafkaNotificationSender : INotificationSender, IHostedService, IDis
             await _sendingTask;
         }
         _producer?.Dispose();
+        _logger.LogInformation("KafkaNotificationSender stopped");
     }
+
+    private async Task SendMessagesAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("KafkaNotificationSender is running");
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                await EnsureProducerCreatedAsync();
+
+                while (await _messageChannel.Reader.WaitToReadAsync(cancellationToken))
+                {
+                    while (_messageChannel.Reader.TryRead(out var message))
+                    {
+                        var serializedMessage = JsonSerializer.Serialize(message);
+                        _logger.LogDebug("Sending message: {SerializedMessage}", serializedMessage);
+                        await _retryPolicy.ExecuteAsync(async () =>
+                        {
+                            await _producer.ProduceAsync(_topic, new Message<Null, string> { Value = serializedMessage }, cancellationToken);
+                            _logger.LogDebug("Message sent successfully");
+                        });
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("KafkaNotificationSender operation cancelled");
+                break;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in SendMessagesAsync");
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+            }
+        }
+        _logger.LogInformation("KafkaNotificationSender stopped running");
+    }
+
+
 
     public Task SendEmailAsync(string recipient, string subject, string plainTextContent, string htmlContent)
     {
@@ -97,39 +143,6 @@ public class KafkaNotificationSender : INotificationSender, IHostedService, IDis
             Data = data
         };
         return _messageChannel.Writer.WriteAsync(message).AsTask();
-    }
-
-    private async Task SendMessagesAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
-            {
-                await EnsureProducerCreatedAsync();
-
-                while (await _messageChannel.Reader.WaitToReadAsync(cancellationToken))
-                {
-                    while (_messageChannel.Reader.TryRead(out var message))
-                    {
-                        var serializedMessage = JsonSerializer.Serialize(message);
-                        await _retryPolicy.ExecuteAsync(async () =>
-                        {
-                            await _producer.ProduceAsync(_topic, new Message<Null, string> { Value = serializedMessage }, cancellationToken);
-                        });
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Graceful shutdown
-                break;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SendMessagesAsync");
-                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-            }
-        }
     }
 
     private async Task EnsureProducerCreatedAsync()

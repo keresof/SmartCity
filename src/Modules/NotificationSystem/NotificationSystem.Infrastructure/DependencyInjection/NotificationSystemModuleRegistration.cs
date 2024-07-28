@@ -27,7 +27,10 @@ public class NotificationSystemModuleRegistration : IModuleRegistration
         .AddScoped<EmailService>()
         .AddScoped<SmsService>()
         .AddScoped<PushNotificationService>()
-        .AddHostedService<KafkaNotificationConsumer>()
-        .AddSingleton<INotificationSender, KafkaNotificationSender>();
+        .AddSingleton<KafkaNotificationSender>()
+        .AddSingleton<INotificationSender>(sp => sp.GetRequiredService<KafkaNotificationSender>())
+        .AddHostedService(sp => sp.GetRequiredService<KafkaNotificationSender>())
+        .AddSingleton<KafkaNotificationConsumer>()
+        .AddHostedService(sp => sp.GetRequiredService<KafkaNotificationConsumer>());
     }
 }

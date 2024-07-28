@@ -41,7 +41,11 @@ public class KafkaNotificationConsumer : BackgroundService
             BootstrapServers = configuration["KafkaBootstrapServers"] ?? "localhost:9092",
             GroupId = configuration["KafkaConsumerGroup"] ?? "notification-consumer",
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = false
+            EnableAutoCommit = false,
+            SecurityProtocol = SecurityProtocol.SaslPlaintext,
+            SaslMechanism = SaslMechanism.Plain,
+            SaslUsername = configuration["KafkaUsername"],
+            SaslPassword = configuration["KafkaPassword"]
         };
 
         _retryPolicy = Policy
@@ -68,6 +72,7 @@ public class KafkaNotificationConsumer : BackgroundService
 
     private async Task ConnectToKafkaAsync(CancellationToken stoppingToken)
     {
+        _logger.LogInformation("Connecting to Kafka...");
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -84,13 +89,17 @@ public class KafkaNotificationConsumer : BackgroundService
                         {
                             try
                             {
+                                _logger.LogInformation("Consuming Kafka message...");
                                 var consumeResult = _consumer.Consume(stoppingToken);
+                                _logger.LogInformation("Received Kafka message: {Message}", consumeResult.Message.Value);
                                 var message = JsonSerializer.Deserialize<NotificationMessage>(consumeResult.Message.Value);
+                                _logger.LogInformation("Received notification message: {Message}", message);
                                 await _messageChannel.Writer.WriteAsync(message, stoppingToken);
                                 _consumer.Commit(consumeResult);
                             }
                             catch (OperationCanceledException)
                             {
+                                _logger.LogInformation("Kafka consumer stopped");
                                 break;
                             }
                             catch (Exception ex)
@@ -119,6 +128,7 @@ public class KafkaNotificationConsumer : BackgroundService
             {
                 try
                 {
+                    _logger.LogInformation("Processing notification message: {Message}", message);
                     using var scope = _scopeFactory.CreateScope();
                     var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                     var command = CreateCommand(message);
